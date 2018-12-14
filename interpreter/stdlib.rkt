@@ -13,29 +13,31 @@
     (cons 'tl (Fun (Lst Any) (list (Lst Any))))
     (cons 'nullp (Fun Bool (list (Lst Any))))
     
-    (cons '+ (Fun Num (list Num Num)))
-    (cons '- (Fun Num (list Num Num)))
-    (cons '* (Fun Num (list Num Num)))
-    (cons '/ (Fun Num (list Num Num)))
-    (cons '% (Fun Num (list Num Num)))
-    (cons 'zerop (Fun Bool (list Num)))
+    (cons '+ (Fun Int (list Int Int)))
+    (cons '- (Fun Int (list Int Int)))
+    (cons '* (Fun Int (list Int Int)))
+    (cons '/ (Fun Int (list Int Int)))
+    (cons '% (Fun Int (list Int Int)))
+    (cons 'zerop (Fun Bool (list Int)))
     
-    (cons '== (Fun Bool (list Num Num)))
-    (cons '!= (Fun Bool (list Num Num)))
-    (cons '< (Fun Bool (list Num Num)))
-    (cons '> (Fun Bool (list Num Num)))
-    (cons '<= (Fun Bool (list Num Num)))
-    (cons '>= (Fun Bool (list Num Num)))
+    (cons '== (Fun Bool (list Int Int)))
+    (cons '!= (Fun Bool (list Int Int)))
+    (cons '< (Fun Bool (list Int Int)))
+    (cons '> (Fun Bool (list Int Int)))
+    (cons '<= (Fun Bool (list Int Int)))
+    (cons '>= (Fun Bool (list Int Int)))
     
     (cons 'and (Fun Bool (list Bool Bool)))
     (cons 'or (Fun Bool (list Bool Bool)))
     (cons 'not (Fun Bool (list Bool)))
     
-    (cons 'print_num (Fun Nil (list Num)))
+    (cons 'print_num (Fun Nil (list Int)))
     (cons 'print_bool (Fun Nil (list Bool)))
     (cons 'print_str (Fun Nil (list Str)))
+    (cons 'print_lst (Fun Nil (list Any)))
     
-    (cons 'str_append (Fun Str (list Str Str))))))
+    (cons 'str_append (Fun Str (list Str Str)))
+    (cons 'atoi       (Fun Int (list Str))))))
 
 ;;; Values of the function in te standard library
 (define *stdlib*
@@ -67,5 +69,7 @@
     (cons 'print_num displayln)
     (cons 'print_bool displayln)
     (cons 'print_str displayln)
+    (cons 'print_lst displayln)
     
-    (cons 'str_append string-append))))
+    (cons 'str_append string-append)
+    (cons 'atoi string->number))))

@@ -29,7 +29,7 @@
 ;;; Formatting type for printing
 (define (fmt-type t (p? #f))
   (match t
-    ('num "num")
+    ('int "int")
     ('str "str")
     ('bool "bool")
     ('nil "nil")
@@ -94,7 +94,7 @@
                          (lambda ()
                            (eprintf "Error: expected a main function.\n")
                            (exit 1)))))
-    (if (not (type-compat? main (Fun Num (list Num (Lst Str)))))
+    (if (not (type-compat? main (Fun Int (list Int (Lst Str)))))
         (begin
           (eprintf "Error: main function must be of type num <- num, str list.\n")
           (exit 1))
@@ -123,13 +123,13 @@
               exprs)) ;; all but the last expressions
 
          ;; now check the last expression in the current env and expect it to
-         ;; be of the exprected type of the block / list of expression.
+         ;; be of the expected type of the block / list of expression.
          (l (check-expr last-expr (cdr ce) expected-type)))
 
     ;; return the block with always the same format : a pair of 1- the list of
     ;; checked expression and 2- the current environment
-    (cons (append (car ce) (list (car l)))
-          (cdr l))))
+      (cons (append (car ce) (list (car l)))
+            (cdr l))))
 
 
 ;;; Checking a single expression
@@ -149,6 +149,17 @@
                (cons (Let id (car expr))
                      (hash-set env id type))))))
 
+    ((Pvar id expr sp)
+      (let ((t (hash-ref env id (lambda ()
+                                  (err sp "~a: unbound identifier" id)))))
+        ;; (if (not (type-compat? expected-type t))
+        ;;    (errt sp expected-type t)
+            (let ((expr (check-expr expr env t)))
+               ;; (displayln (car expr))
+               (cons (Let id (car expr))
+                     (hash-set env id t)))))
+
+
     ((Pfundef rec? id args body type sp)
      (if (hash-has-key? env id)
          (err sp "~a: duplicate definition" id)
@@ -166,6 +177,20 @@
                            ;; #f because we don't know the lexical environement yet
                      (cons (Let id (Closure rec? (if rec? (cdr args) args) (car expr) #f))
                            (hash-set env id type))))))))
+
+
+    ((Pcond test yes no sp)
+     (let ((t (check-expr test env Bool))
+           (y (check-expr yes env expected-type))
+           (n (check-expr no env expected-type)))
+       (cons (Cond (car t) (car y) (car n))
+             env)))
+
+    ((Piter test body sp)
+     (let ((ti (check-expr test env Bool))
+           (b  (check-expr body env expected-type)))
+       (cons (Iter (car ti) (car b))
+             env)))
 
     ((Pident id sp)
      (let ((t (hash-ref env id (lambda ()
@@ -185,14 +210,8 @@
                                    args (Fun-args ft)))
                      env)))))
 
-    ((Pcond test yes no sp)
-     (let ((t (check-expr test env Bool))
-           (y (check-expr yes env expected-type))
-           (n (check-expr no env expected-type)))
-       (cons (Cond (car t) (car y) (car n))
-             env)))
-
     ((Pblock exprs sp)
+     ;; (displayln exprs)
      (cons (Block (car (check-exprs exprs env expected-type)))
            env))
 

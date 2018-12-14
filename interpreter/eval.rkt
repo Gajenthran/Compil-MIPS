@@ -39,7 +39,7 @@
     ;; Binding a variable evaluates to nothing but adds it to the environment
     ((Let id def)
      (cons #f
-           (hash-set env id (car (eval-expr def env)))))
+           (hash-set env id (car (eval-expr def env)))))    ;; TODO
 
     ;; Closure definition amounts to capturing its lexical environment
     ((Closure rec? args body _)
@@ -86,6 +86,16 @@
                     (eval-expr yes env)
                     (eval-expr no env)))
            env))
+
+    ;; Iteration
+    ((Iter test body)
+      (cons (let loop ((t (eval-expr test env)))
+                    ;; (displayln body)
+                    (unless (eq? (car t) #f)
+                          (eval-expr body env)
+                          (loop (eval-expr test env))))
+            env))
+
 
     ;; Block are evaluated as list of expressions
     ((Block exprs)

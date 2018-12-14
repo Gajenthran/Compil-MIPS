@@ -1,0 +1,69 @@
+/* 
+ * Argument d'une fonction
+ * Nombre à virgule
+ * Fonction récursive 
+ * Return fonction 
+ * boucle while 
+ * Nombre négatif
+ */
+
+// let str list lste = ["toto" , "popo"];
+int nb = 4;
+
+/* let square n : num <- num = {
+  n * n
+};
+
+let setNb n : num <- num = {
+  nb = n;
+  1
+}; */
+/* let max m, n : num <- num, num = {
+  if(m > n) then
+    m
+  else
+    n
+};
+
+let rec fact n : num <- num = {
+    if(n <= 1) then {
+      print_str "récursion finie !\n" ;
+      1
+    }
+
+    else {
+      print_num (n + 1);
+      13
+    }
+}; */
+
+// let main argc, argv : num <- num, str list = {
+// ((Llet type Lident fargs Lcol argtypes Lassign expr)
+int main argc, argv : int, str list = {
+  nb = 10;
+  /* while(nb < 5) then {
+    nb = nb + 1;
+    print_num nb;
+    1
+  }; */
+
+  /* if(nb <= 0) then {
+    print_str "négatif";
+    nb = 100;
+    1
+  }
+
+  else {
+    print_str "positif";
+    nb = 0;
+    1
+  }; */
+
+
+  print_num(nb);
+  // let num rep = square(nb);
+  // setNb(100);
+  // print_num(atoi(str_append "10" "11"));
+  // print_num(nb);
+  1294
+}

@@ -6,13 +6,12 @@
 
 (provide liec-parser)
 
-;; macro pour pouvoir écrire (sp n) plutôt que $n-start-pos
+
 (require (for-syntax racket/base))
-(define-syntax (sp stx)
-  (datum->syntax
-   stx
-   (string->symbol (string-append "$" (number->string (cadr (syntax->datum stx)))
-                                  "-start-pos"))))
+(require compatibility/defmacro)
+(defmacro sp n
+  (string->symbol (string-append "$" (number->string (car n)) "-start-pos")))
+
 (define parse
   (parser
    (src-pos)
@@ -22,48 +21,57 @@
 
    (grammar
 
+    ;; (ftype
+    ;;  ((type Larrow argtypes) (Fun $1 $3)))
+
     (prog
      ((definition Lsc prog) (cons $1 $3))
      ((definition)          (list $1)))
 
     (definition
-      ((Llet Lident Lcol type Lassign expr)             (Pvardef $2 $6 $4 (sp 2)))
-      ((Llet Lident fargs Lcol ftype Lassign expr)      (Pfundef #f $2 $3 $7 $5 (sp 2)))
-      ((Llet Lrec Lident fargs Lcol ftype Lassign expr) (Pfundef #t $3 $4 $8 $6 (sp 3))))
+      ;; ((Llet Lident fargs Lcol ftype Lassign expr)           (Pfundef #f $2 $3 $7 $5 (sp 2)))
+      ;; ((Llet type Lident Lassign expr)                       (Pvardef $3 $5 $2 (sp 2)))
+      ;; ((Llet Lrec Lident fargs Lcol ftype Lassign expr)      (Pfundef #t $3 $4 $8 $6 (sp 3)))
+      ((type Lident Lassign expr)                               (Pvardef $2 $4 $1 (sp 2)))
+      ((type Lident fargs Lcol argtypes Lassign expr)           (Pfundef #f $2 $3 $7 (Fun $1 $5) (sp 2)))
+      ((Lrec type Lident fargs Lcol argtypes Lassign expr)      (Pfundef #t $3 $4 $8 (Fun $2 $6) (sp 3)))
+      ((Lident Lassign expr)                                    (Pvar    $1 $3 (sp 2))))
 
     (type
      ((type Llist) (Lst $1))
      ((Ltype)      $1))
 
-    (ftype
-     ((type Larrow argtypes) (Fun $1 $3)))
-
     (argtypes
      ((type Lcom argtypes)              (cons $1 $3))
-     ((type)                            (list $1))
-     ((Lopar ftype Lcpar Lcom argtypes) (cons $2 $5))
-     ((Lopar ftype Lcpar)               (list $2)))
+     ((type)                            (list $1)))
+     ;; ((Lopar ftype Lcpar Lcom argtypes) (cons $2 $5))
+     ;;((Lopar ftype Lcpar)               (list $2)))
 
     (fargs
-     ((Lident fargs) (cons (Pident $1 (sp 1)) $2))
-     ((Lident)       (list (Pident $1 (sp 1))))
-     ((Lnil)         (list (Pident 'nil (sp 1)))))
+     ((Lident Lcom fargs) (cons (Pident $1 (sp 1)) $3))
+     ((Lident)            (list (Pident $1 (sp 1))))
+     ((Lnil)              (list (Pident 'nil (sp 1)))))
 
     (expr
-     ((definition)        $1)
-     ((atom)              $1)
-     ((funcall)           $1)
-     ((operation)         $1)
-     ((test)              $1)
-     ((Lopar expr Lcpar)  $2)
-     ((Lbegin exprs Lend) (Pblock $2 (sp 1))))
+     ((definition)          $1)
+     ((atom)                $1)
+     ((funcall)             $1)
+     ((operation)           $1)
+     ((test)                $1)
+     ((iter)                $1)
+     ((Lopar expr Lcpar)    $2)
+     ((Locbra exprs Lccbra) (Pblock $2 (sp 1))))
 
     (exprs
      ((expr Lsc exprs) (cons $1 $3))
      ((expr)           (list $1)))
 
+    
+    (iter
+      ((Lwhile expr Lthen expr) (Piter $2 $4 (sp 1))))
+
     (test
-     ((Lif expr Lthen expr Lelse expr) (Pcond $2 $4 $6 (sp 1))))
+     ((Lif expr Lthen expr Lelse expr) (Pcond $2 $4 $6 (sp 1)))) ;; TODO
 
     (funcall
      ((Lident args) (Pcall $1 $2 (sp 1))))
@@ -100,15 +108,14 @@
     (atom
      ((Lnil)   (Pconst 'nil '() (sp 1)))
      ((Lbool)  (Pconst 'bool $1 (sp 1)))
-     ((Lnum)   (Pconst 'num $1 (sp 1)))
+     ((Lnum)   (Pconst 'int $1 (sp 1)))
      ((Lstr)   (Pconst 'str $1 (sp 1)))
      ((Lident) (Pident $1 (sp 1)))
-
      ((Lobra elem Lcbra) $2))
 
     (elem
-     ((expr Lsc elem) (Pcall 'cons (list $1 $3) (sp 1)))
-     ((expr)          (Pcall 'cons (list $1 (Pconst 'nil '() #f)) (sp 1)))
+     ((expr Lcom elem) (Pcall 'cons (list $1 $3) (sp 1)))
+     ((expr)           (Pcall 'cons (list $1 (Pconst 'nil '() #f)) (sp 1)))
      (()              (Pconst 'nil '() #f)))
 
    )
