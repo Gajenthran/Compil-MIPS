@@ -7,8 +7,7 @@
 ;;; ---------------------------------------------------
 
 ;;; Definition of variables
-;; "let" type id "=" expr
-;; (struct Pvardef (id expr type pos)          #:transparent)
+;; type id "=" expr
 (struct Pvardef (id expr type pos)          #:transparent)
 
 ;;; Definition of variables
@@ -16,7 +15,7 @@
 (struct Pvar    (id expr pos)				#:transparent)
 
 ;;; Definition of functions
-;; "let" ( "rec" )? id args ":" type "=" body
+;; ( "rec" )? type-ret id "(" args ":" type-args ")" body
 (struct Pfundef (rec id args body type pos) #:transparent)
 
 ;;; Identifier
@@ -106,5 +105,3 @@
 
 ;;; Function that takes <args> and returns <ret>
 (struct Fun (ret args)                      #:transparent)
-
-(struct Funargs (types args)                #:transparent)

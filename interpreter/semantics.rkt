@@ -96,7 +96,7 @@
                            (exit 1)))))
     (if (not (type-compat? main (Fun Int (list Int (Lst Str)))))
         (begin
-          (eprintf "Error: main function must be of type num <- num, str list.\n")
+          (eprintf "Error: int main(argc, argv : int, str list).\n")
           (exit 1))
         (car cp))))
 
@@ -128,6 +128,8 @@
 
     ;; return the block with always the same format : a pair of 1- the list of
     ;; checked expression and 2- the current environment
+      ;;(displayln last-expr)
+      ;;(displayln "")
       (cons (append (car ce) (list (car l)))
             (cdr l))))
 
@@ -155,7 +157,6 @@
         ;; (if (not (type-compat? expected-type t))
         ;;    (errt sp expected-type t)
             (let ((expr (check-expr expr env t)))
-               ;; (displayln (car expr))
                (cons (Let id (car expr))
                      (hash-set env id t)))))
 
@@ -211,7 +212,6 @@
                      env)))))
 
     ((Pblock exprs sp)
-     ;; (displayln exprs)
      (cons (Block (car (check-exprs exprs env expected-type)))
            env))
 

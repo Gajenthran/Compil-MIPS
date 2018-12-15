@@ -90,7 +90,6 @@
     ;; Iteration
     ((Iter test body)
       (cons (let loop ((t (eval-expr test env)))
-                    ;; (displayln body)
                     (unless (eq? (car t) #f)
                           (eval-expr body env)
                           (loop (eval-expr test env))))

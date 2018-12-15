@@ -1,45 +1,47 @@
 /* 
- * Argument d'une fonction
  * Nombre à virgule
- * Fonction récursive 
+ * Alternative (avec option)
+ * Argument d'une fonction
  * Return fonction 
- * boucle while 
- * Nombre négatif
+ * boucle while/for
+ * portée des variables
+ * bloc d'une fonction/structure de contrôle
  */
 
-// let str list lste = ["toto" , "popo"];
+
+str list lste = ["toto" , "popo"];
 int nb = 4;
 
-/* let square n : num <- num = {
+int square(n : int) {
   n * n
 };
 
-let setNb n : num <- num = {
+int setNb(n : int) {
   nb = n;
   1
-}; */
-/* let max m, n : num <- num, num = {
+};
+
+int max(m, n : int, int) {
   if(m > n) then
     m
   else
     n
 };
 
-let rec fact n : num <- num = {
+rec int fact(n, res: int, int) {
     if(n <= 1) then {
-      print_str "récursion finie !\n" ;
-      1
+      print_str("récursion finie !\n");
+      res * n
     }
 
     else {
-      print_num (n + 1);
-      13
+      print_lst(lste);
+      fact(n - 1, res * n);
+      res * n
     }
-}; */
+};
 
-// let main argc, argv : num <- num, str list = {
-// ((Llet type Lident fargs Lcol argtypes Lassign expr)
-int main argc, argv : int, str list = {
+int main(argc, argv : int, str list) {
   nb = 10;
   /* while(nb < 5) then {
     nb = nb + 1;
@@ -47,23 +49,25 @@ int main argc, argv : int, str list = {
     1
   }; */
 
-  /* if(nb <= 0) then {
-    print_str "négatif";
+  if(nb <= 0) then {
+    print_str("négatif");
     nb = 100;
     1
   }
 
   else {
-    print_str "positif";
+    print_str("positif");
     nb = 0;
     1
-  }; */
+  };
 
+  int toto = 2;
+  bool b = false;
 
-  print_num(nb);
-  // let num rep = square(nb);
+  nb = max(toto, nb);
+  nb = fact(3, 1);
   // setNb(100);
-  // print_num(atoi(str_append "10" "11"));
-  // print_num(nb);
+  print_num(atoi(strcat("98", "38")) / 2);
+  print_num(nb);
   1294
 }

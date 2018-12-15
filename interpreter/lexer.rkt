@@ -44,20 +44,20 @@
   (:: latin_ (:* latin_num)))
 
 (define-lex-abbrev number
-  (:: (:? "-") (:+ numeric)))  ;; (:? "." (:+ numeric))))
+  (:: (:? "-") (:+ numeric)))     ;; TODO : float? 
 
 (define-lex-abbrev bool
   (:or "true" "false"))
 
 (define-lex-abbrev types
-  (:or "int" "str" "bool" "nil"))
+  (:or "int" "str" "bool" "nil"))  ;; TODO : mot-clé const, static...
 
 
 ;; lexer
 (define liec-lexer
   (lexer-src-pos
    ;; ("let"       (token-Llet))
-   ;; ("<-"        (token-Larrow))     ;; TODO
+   ;; ("<-"        (token-Larrow))
    ((eof)       (token-Leof))
    (whitespace  (return-without-pos (liec-lexer input-port)))
    ("//"        (return-without-pos (comment-lexer input-port)))
@@ -68,9 +68,9 @@
    (","         (token-Lcom))
    ("if"        (token-Lif))
    ("then"      (token-Lthen))
-   ("else"      (token-Lelse))      ;; TODO
+   ("else"      (token-Lelse))
    ("{"         (token-Locbra))
-   ("while"     (token-Lwhile))     ;; TODO
+   ("while"     (token-Lwhile))     ;; TODO : for loop 
    ("}"         (token-Lccbra))
    ("=="        (token-Leq))
    ("!="        (token-Lneq))
@@ -86,7 +86,7 @@
    ("%"         (token-Lmod))
    ("&&"        (token-Land))
    ("||"        (token-Lor))
-   ("not"       (token-Lnot))
+   ("!"         (token-Lnot))
    (";"         (token-Lsc))
    ("::"        (token-Lcc))
    ("("         (token-Lopar))
@@ -95,7 +95,7 @@
    ("]"         (token-Lcbra))
    ("()"        (token-Lnil))
    (types       (token-Ltype (string->symbol lexeme)))
-   ("list"      (token-Llist))                            ;; Lstar? 
+   ("list"      (token-Llist))                            ;; Lstar without list? 
    (bool        (token-Lbool (string=? "true" lexeme)))
    (number      (token-Lnum (string->number lexeme)))
    ("\""        (token-Lstr (apply string-append (string-lexer input-port))))
