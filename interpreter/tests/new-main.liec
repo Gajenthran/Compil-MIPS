@@ -63,6 +63,5 @@ int main(argc, argv : int, str list) {
   bool b = false;
 
   // setNb(100);
-  // print_num(atoi(strcat("98", "38")) / 2);
-  // print_num(nb);
+  return 999;
 }

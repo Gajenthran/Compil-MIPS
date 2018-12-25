@@ -128,6 +128,8 @@
 
     ;; return the block with always the same format : a pair of 1- the list of
     ;; checked expression and 2- the current environment
+      ;;(displayln last-expr)
+      ;; (displayln "")
       (cons (append (car ce) (list (car l)))
             (cdr l))))
 
@@ -184,6 +186,14 @@
        (cons (Cond (car t) (car y) (car n))
              env)))
 
+
+
+    ((Pfunblock exprs ret sp)
+     (let ((e (car (check-exprs exprs env Any)))
+           (r (car (check-expr ret env expected-type))))
+       (cons (Funblock e r)
+             env)))
+
     ((Piter test body sp)
      (let ((ti (check-expr test env Bool))
            (b  (check-expr body env expected-type)))
@@ -209,8 +219,9 @@
                      env)))))
 
     ((Pblock exprs sp)
-     (cons (Block (car (check-exprs exprs env expected-type)))
+     (cons (Block (car (check-exprs exprs env Any)))
            env))
+
 
     ((Pconst type value sp)
      (if (not (type-compat? expected-type type))

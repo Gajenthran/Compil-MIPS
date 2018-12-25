@@ -35,10 +35,10 @@
     (cons 'print_bool (Fun Nil (list Bool)))
     (cons 'print_str  (Fun Nil (list Str)))
     (cons 'print_lst  (Fun Nil (list Any)))
-    (cons 'printf     (Fun Nil Any))            ;; TODO : compilator with variable arguments?
+   ;; (cons 'printf     (Fun Nil Any))            ;; TODO : compilator with variable arguments?
     
     (cons 'strcat (Fun Str (list Str Str)))
-    (cons 'atoi       (Fun Int (list Str))))))
+    (cons 'atoi   (Fun Int (list Str))))))
 
 ;;; Values of the function in te standard library
 (define *stdlib*

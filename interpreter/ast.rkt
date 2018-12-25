@@ -39,7 +39,7 @@
 (struct Pfunblock (exprs ret pos)           #:transparent)
 
 ;;; Block
-;; "begin" expr ( ";" expr )* "end"
+;; "{" expr ( ";" expr )* "}"
 (struct Pblock  (exprs pos)                 #:transparent) ;;; TODO
 
 ;;; Constant values
@@ -79,7 +79,9 @@
 ;;; Block
 ;; Evaluates to the value of last expression in the list <exprs>. Previous
 ;; expressions are evaluated for their side-effect (binding, printing, …).
-(struct Block   (exprs)                     #:transparent)
+(struct Block   (exprs)                            #:transparent)
+
+(struct Funblock (exprs ret)                     #:transparent)
 
 ;;; Constant value
 ;; Evaluates to the value of <value>.
