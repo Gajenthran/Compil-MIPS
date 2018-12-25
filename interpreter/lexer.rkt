@@ -56,8 +56,6 @@
 ;; lexer
 (define liec-lexer
   (lexer-src-pos
-   ;; ("let"       (token-Llet))
-   ;; ("<-"        (token-Larrow))
    ((eof)       (token-Leof))
    (whitespace  (return-without-pos (liec-lexer input-port)))
    ("//"        (return-without-pos (comment-lexer input-port)))

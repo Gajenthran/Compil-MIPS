@@ -124,12 +124,10 @@
 
          ;; now check the last expression in the current env and expect it to
          ;; be of the expected type of the block / list of expression.
-         (l (check-expr last-expr (cdr ce) expected-type)))
+         (l (check-expr last-expr (cdr ce) Any)))
 
     ;; return the block with always the same format : a pair of 1- the list of
     ;; checked expression and 2- the current environment
-      ;;(displayln last-expr)
-      ;;(displayln "")
       (cons (append (car ce) (list (car l)))
             (cdr l))))
 
@@ -141,7 +139,6 @@
 ;;; I believe the code is pretty self-explainatory
 (define (check-expr expr env expected-type)
   (match expr
-
     ((Pvardef id expr type sp)
      (if (hash-has-key? env id)
          (err sp "~a: duplicate definition" id)
@@ -154,11 +151,11 @@
     ((Pvar id expr sp)
       (let ((t (hash-ref env id (lambda ()
                                   (err sp "~a: unbound identifier" id)))))
-        ;; (if (not (type-compat? expected-type t))
-        ;;    (errt sp expected-type t)
+        (if (not (type-compat? expected-type t))
+            (errt sp expected-type t)
             (let ((expr (check-expr expr env t)))
                (cons (Let id (car expr))
-                     (hash-set env id t)))))
+                     (hash-set env id t))))))
 
 
     ((Pfundef rec? id args body type sp)

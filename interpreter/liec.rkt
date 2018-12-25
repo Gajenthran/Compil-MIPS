@@ -15,10 +15,10 @@
 
    (define prog (liec-check parsed))
    (printf "Typing ok.\n")
+   ;; (displayln prog)
 
    (define ret (liec-eval prog))
-   (newline)
-   (exit ret))
+   (displayln ret))
   (else
    (eprintf "Usage: racket liec.rkt <source.liec>\n")
    (exit 1)))

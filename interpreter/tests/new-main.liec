@@ -12,7 +12,7 @@
 str list lste = ["toto" , "popo"];
 int nb = 4;
 
-int square(n : int) {
+/* int square(n : int) {
   n * n
 };
 
@@ -22,14 +22,14 @@ int setNb(n : int) {
 };
 
 int max(m, n : int, int) {
-  if(m > n) then
+  if(m > n)
     m
   else
     n
 };
 
 rec int fact(n, res: int, int) {
-    if(n <= 1) then {
+    if(n <= 1) {
       print_str("récursion finie !\n");
       res * n
     }
@@ -39,35 +39,30 @@ rec int fact(n, res: int, int) {
       fact(n - 1, res * n);
       res * n
     }
-};
+}; */
 
 int main(argc, argv : int, str list) {
   nb = 10;
-  /* while(nb < 5) then {
+  /* while(nb < 5) {
     nb = nb + 1;
     print_num nb;
     1
   }; */
 
-  if(nb <= 0) then {
+  if(nb <= 0) {
     print_str("négatif");
     nb = 100;
-    1
   }
 
   else {
     print_str("positif");
     nb = 0;
-    1
-  };
+  }
 
   int toto = 2;
   bool b = false;
 
-  nb = max(toto, nb);
-  nb = fact(3, 1);
   // setNb(100);
-  print_num(atoi(strcat("98", "38")) / 2);
-  print_num(nb);
-  1294
+  // print_num(atoi(strcat("98", "38")) / 2);
+  // print_num(nb);
 }

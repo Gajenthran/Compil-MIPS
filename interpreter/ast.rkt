@@ -34,9 +34,13 @@
 ;; "while" iter body
 (struct Piter   (test body pos)             #:transparent)
 
+;;; Function block
+;; "{" expr ( ";" expr )* return sexpr "}" 
+(struct Pfunblock (exprs ret pos)           #:transparent)
+
 ;;; Block
 ;; "begin" expr ( ";" expr )* "end"
-(struct Pblock  (exprs pos)                 #:transparent)
+(struct Pblock  (exprs pos)                 #:transparent) ;;; TODO
 
 ;;; Constant values
 ;; value
