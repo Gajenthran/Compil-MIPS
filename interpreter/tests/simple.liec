@@ -1,10 +1,12 @@
-int setnb(to : int) {
+int nbo = 99;
+
+/*int setnb(to : int) {
 	int it = 10;
-	return to;
-}
+	return nbo;
+} */
 
 int main(argc, argv : int, str list) {
-	int nb = 10;
+/*	int nb = 10;
 
 	if(nb <= 10) {
 		nb = 1;
@@ -13,6 +15,7 @@ int main(argc, argv : int, str list) {
 	else
 		nb = nb - 1;
 	setnb(100);
-	print_num(nb);
-	return 999;
+	print_num(nb); */
+	str car = "foo";
+	return nbo;
 }

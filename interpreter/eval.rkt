@@ -101,7 +101,8 @@
      (eval-exprs exprs env))
 
     ((Funblock exprs ret)
-      (eval-exprs exprs env))
+      (eval-expr ret env))
+
 
     ;; Constant are their own value
     ((Const value)

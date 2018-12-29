@@ -2,14 +2,13 @@
  * Nombre à virgule
  * Alternative (avec option)
  * Argument d'une fonction
- * Return fonction 
  * boucle while/for
  * portée des variables
  * bloc d'une fonction/structure de contrôle
  */
 
 
-str list lste = ["toto" , "popo"];
+// str list lste = ["toto" , "popo"];
 int nb = 4;
 
 /* int square(n : int) {
@@ -43,22 +42,11 @@ rec int fact(n, res: int, int) {
 
 int main(argc, argv : int, str list) {
   nb = 10;
-  /* while(nb < 5) {
+  while(!(nb < 5 && nb < 3)) {
     nb = nb + 1;
-    print_num nb;
-    1
-  }; */
-
-  if(nb <= 0) {
-    print_str("négatif");
-    nb = 100;
+    print_num(nb);
   }
-
-  else {
-    print_str("positif");
-    nb = 0;
-  }
-
+  
   int toto = 2;
   bool b = false;
 

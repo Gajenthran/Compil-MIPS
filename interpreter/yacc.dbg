@@ -22,7 +22,7 @@
 21	expr	=	(Locbra exprs Lccbra)
 22	exprs	=	(expr exprs)
 23	exprs	=	(expr)
-24	iter	=	(Lwhile Lopar expr Lcpar expr)
+24	iter	=	(Lwhile Lopar sexpr Lcpar expr)
 25	test	=	(Lif Lopar sexpr Lcpar expr Lelse expr)
 26	funcall	=	(Lident Lopar args Lcpar)
 27	args	=	(sexpr Lcom args)
@@ -1734,7 +1734,7 @@ State 98
 	Lopar					shift	107
 
 State 99
-	iter -> Lwhile . Lopar expr Lcpar expr 
+	iter -> Lwhile . Lopar sexpr Lcpar expr 
 
 	Lopar					shift	108
 
@@ -1850,21 +1850,20 @@ State 107
 	sexpr					goto	112
 
 State 108
-	iter -> Lwhile Lopar . expr Lcpar expr 
+	iter -> Lwhile Lopar . sexpr Lcpar expr 
 
-	Lwhile					shift	99
-	funcall					goto	97
-	Lident					shift	102
-	test					goto	96
-	iter					goto	95
-	Locbra					shift	101
-	definition					goto	92
-	Lrec					shift	5
-	expr					goto	113
-	type					goto	4
-	Ltype					shift	7
-	Lif					shift	98
-	Lopar					shift	100
+	Lopar					shift	23
+	atom					goto	20
+	Lnil					shift	21
+	Lnum					shift	26
+	funcall					goto	17
+	Lnot					shift	22
+	Lident					shift	25
+	Lbool					shift	28
+	operation					goto	19
+	Lobra					shift	24
+	Lstr					shift	27
+	sexpr					goto	113
 
 State 109
 	expr -> Lopar expr . Lcpar 
@@ -1943,9 +1942,37 @@ State 112
 	Lgt					shift	37
 
 State 113
-	iter -> Lwhile Lopar expr . Lcpar expr 
+	iter -> Lwhile Lopar sexpr . Lcpar expr 
+	operation -> sexpr . Ladd sexpr 
+	operation -> sexpr . Lsub sexpr 
+	operation -> sexpr . Lmul sexpr 
+	operation -> sexpr . Ldiv sexpr 
+	operation -> sexpr . Lmod sexpr 
+	operation -> sexpr . Leq sexpr 
+	operation -> sexpr . Lneq sexpr 
+	operation -> sexpr . Llt sexpr 
+	operation -> sexpr . Lgt sexpr 
+	operation -> sexpr . Llte sexpr 
+	operation -> sexpr . Lgte sexpr 
+	operation -> sexpr . Land sexpr 
+	operation -> sexpr . Lor sexpr 
+	operation -> sexpr . Lcc sexpr 
 
+	Llte					shift	38
+	Lmul					shift	42
+	Ldiv					shift	43
+	Leq					shift	34
+	Lneq					shift	35
+	Lor					shift	46
+	Lcc					shift	48
+	Llt					shift	36
+	Lgte					shift	39
+	Land					shift	45
+	Lsub					shift	41
+	Ladd					shift	40
+	Lmod					shift	44
 	Lcpar					shift	118
+	Lgt					shift	37
 
 State 114
 	expr -> Lopar expr Lcpar . 
@@ -2000,7 +2027,7 @@ State 117
 	Lopar					shift	100
 
 State 118
-	iter -> Lwhile Lopar expr Lcpar . expr 
+	iter -> Lwhile Lopar sexpr Lcpar . expr 
 
 	Lwhile					shift	99
 	funcall					goto	97
@@ -2038,7 +2065,7 @@ State 120
 	Lelse					shift	122
 
 State 121
-	iter -> Lwhile Lopar expr Lcpar expr . 
+	iter -> Lwhile Lopar sexpr Lcpar expr . 
 
 	Lopar					reduce	24
 	Locbra					reduce	24
