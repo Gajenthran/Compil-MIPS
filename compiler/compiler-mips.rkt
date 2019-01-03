@@ -6,14 +6,19 @@
 ;;; Ecrire un bloc d'instructions
 ;;; Opérations ne fonctionnent pas
 ;;; Appels systèmes de SPIM
-;;; Créer génériquement des labels (pour cond et boucles)
+;;; Conditions considérant une seule instruction
 
 
 #lang racket/base
 
 (require racket/match
-         "ast.rkt"
-         "mips.rkt")
+         "mips.rkt"
+         "../interpreter/parser.rkt"
+         "../interpreter/semantics.rkt"
+         "../interpreter/eval.rkt"
+         "../interpreter/eval.rkt"
+         "../interpreter/stdlib.rkt"
+         "ast.rkt")
 
 ;;;;; compilateur Python vers MIPS
 ;; la convention utilisée dans ce compilateur est
@@ -23,6 +28,7 @@
 (define accLoop 0) ;; accumulateur pour les boucles
 (define accCond 0) ;; accumulateur pour les conditions
 
+(provide comp)
 (define-syntax increment
   (syntax-rules ()
     ((_ x)   (begin (set! x (+ x 1)) x))
@@ -32,9 +38,9 @@
   (match ast
     ((Nil)
      ;; On représente Nil par l'adresse 0 (comme NULL en C)
-     (comp (Num 0) env fp-sp))
+     (comp (Const 0) env fp-sp))
 
-    ((Num n)
+    ((Const n)
      ;; Constante entière mise dans v0
      (list (Li 'v0 n)))
 
@@ -80,26 +86,8 @@
       ;; on récupère le second élément dans v0
       (list (Lw 'v0 (Mem 4 'v0)))))
 
-    ((Let n v e)
-     ;; Variable locale : let n = v in e
-     (append
-      ;; on compile v pour avoir sa valeur dans v0 :
-      (comp v env fp-sp)
-      ;; on empile la variable locale :
-      (list (Addi 'sp 'sp -4)
-            (Sw 'v0 (Mem 0 'sp)))
-      ;; à partir de là fp - sp a grandi de 4 :
-      (let ((fp-sp (- fp-sp 4)))
-        ;; on compile e pour le mettre dans v0 :
-        (comp e
-              ;; en associant n à son adresse dans la pile par rapport
-              ;; à fp, pour que cette adresse soit fixe
-              (hash-set env n (Mem fp-sp 'fp))
-              fp-sp))))
-
-
     ;; Operation en prenant en paramètre l'opérande et deux valeurs
-    ((Op oper v1 v2)
+    ((Op symbol v1 v2)
      (append
 
       (comp v1 env fp-sp)
@@ -112,14 +100,14 @@
             (Addi 'sp 'sp 4)
             (Move 't1 'v0) ;; on récupère v2
             (cond ;; On execute l'operation selon l'opérande
-             ((equal? oper 'Add)
+             ((equal? symbol 'Add)
               (Add 'v0 't0 't1))
-             ((equal? oper 'Sub)
+             ((equal? symbol 'Sub)
               (Sub 'v0 't0 't1))
-             ((equal? oper 'Mult)
+             ((equal? symbol 'Mult)
               (Mult 't0 't1)
-              (Lo 'v0)) ;;; TODO: Seulement une seule opération
-             ((equal? oper 'Div)
+              (Lo 'v0)) ;;;  v: Seulement une seule opération
+             ((equal? symbol 'Div)
               (Div 't0 't1)
               (Lo 'v0))
              (else
@@ -162,7 +150,8 @@
       (list (Label (string-append "loop_" (number->string accLoop)))
             (Beqz 't9 (string-append "endloop_" (number->string accLoop))))
       (comp body env (- fp-sp 4))
-      (list (B (string-append "loop_" (number->string accLoop))))))
+      (list (B (string-append "loop_" (number->string accLoop))))
+      (list (Label (string-append "endloop_" (number->string accLoop))))))
 
     ;; Condition qui compile d'abord le test puis va sur le label then ou else 
     ;; Et une fois fini continue les instructions sur le label endif
@@ -178,6 +167,7 @@
 
       (list (Label (string-append "then_" (number->string accCond))))
       (comp yes env (- fp-sp 4))
+      (list (B (string-append "endif_" (number->string accCond))))
 
       (list (Label (string-append "else_" (number->string accCond))))
       (comp no env (- fp-sp 8))
@@ -186,9 +176,33 @@
 
     ;; Bloc d'instructions utilisé pour le corps des conditions, 
     ;; des boucles, ou des fonctions. A FAIRE!
-    ((Block label body)
+    ((Block body)
      (append
-      (comp body env fp-sp)))
+      (comp (car body) env fp-sp)
+      (comp (car (cdr body)) env fp-sp)))
+  ;;   (append
+  ;;    (map (lambda (expr)
+  ;;            (displayln expr))
+  ;;            ;;(comp expr env fp-sp))
+  ;;         body)))
+
+    ((Let n v)
+     ;; Variable locale : let n = v in e
+     (append
+      ;; on compile v pour avoir sa valeur dans v0 :
+      (comp v (hash-set env n (Mem fp-sp 'fp)) fp-sp)
+      ;; on empile la variable locale :
+      (list (Addi 'sp 'sp -4)
+            (Sw 'v0 (Mem 0 'sp)))))
+
+      ;; à partir de là fp - sp a grandi de 4 :
+  #|    (let ((fp-sp (- fp-sp 4)))
+        ;; on compile e pour le mettre dans v0 :
+        (comp e
+              ;; en associant n à son adresse dans la pile par rapport
+              ;; à fp, pour que cette adresse soit fixe
+              (hash-set env n (Mem fp-sp 'fp))
+              fp-sp)))) |#
 
     ((Var n)
      ;; Référence à une variable
@@ -232,6 +246,23 @@
                    (printf "~a: .asciiz ~s\n" k v)))
   (printf "\n.text\n.globl main\nmain:\n"))
 
+#|(define argv (current-command-line-arguments))
+(cond
+  ((>= (vector-length argv) 1)
+   (define in (open-input-file (vector-ref argv 0)))
+   (port-count-lines! in)
+   (define parsed (liec-parser in))
+   (close-input-port in)
+
+   (define prog (check-exprs parsed (make-immutable-hash) Nil))
+   (displayln (car (car prog)))
+   
+   (define ret (comp (car (car prog)) (make-immutable-hash) 0))
+   (displayln ret)) 
+  
+  (else
+   (eprintf "Usage: racket liec.rkt <source.liec>\n")
+   (exit 1))) |#
 
 (mips-data (make-hash '((str_123 . "coucou") (nl . "\n"))))
 (for-each mips-emit
@@ -240,10 +271,13 @@
            (list (Move 'fp 'sp))
 
            ;; On compile une expression :
-           (comp (Loop (Test 'Eq (Num 92) (Num 42)) (Nil))
-                 ;; (Let a' (Num 18) (Var 'a))
-                 ;; (Test 'Eq (Num 32) (Num 42))
-                 ;; (Cond (Test 'Gt (Var 'a) (Num 18) 
+           (comp (Block (list (Let 'nbo (Const 18)) (Nil)))
+                 ;;(Block (list (Const 18) (Const 24)))
+                 ;;(Op 'Div (Const 14) (Const 11))
+                 ;;(Cond (Test 'Gt (Const 14) (Const 11)) (Let 'nbo (Const 93)) (Const 28))
+                 ;;(Loop (Test 'Eq (Const 92) (Const 42)) (Const 33))
+                 ;;(Let 'a (Const 18))
+                 ;; ((Test 'Eq (Num 32) (Num 42))
                  ;;       (Let 'b (Num 18))
                  ;;       (Let 'b (Num 0))))
 
@@ -251,12 +285,14 @@
                  (make-immutable-hash)
                  ;; et fp-sp = 0 (vu que fp = sp à ce moment là) :
                  0)
+
+
            ;; On affiche le résultat, qui est dans v0
            (list (Move 't5 'v0)
                  (Li 'v0 1)
                  (Move 'a0 't5)
                  (Syscall)
-           ;;(Move 'a0 'v0)
+                 ;;(Move 'a0 'v0)
                  ;;(Li 'v0 4) ;; 4 pour print_string qui est le type du résultat
                  ;;(Syscall)
                  ;; affichage retour à la ligne :

@@ -2,7 +2,7 @@
 
 (provide (all-defined-out))
 
-;;;;; MIPS
+
 (struct Move (rd rs))
 (struct Li (r i))
 (struct La (r a))
