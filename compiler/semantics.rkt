@@ -1,7 +1,7 @@
 #lang racket/base
 
 (require racket/match
-         "astint.rkt"
+         "ast.rkt"
          "stdlib.rkt"
          (only-in parser-tools/lex
                   (position-line posl)
@@ -177,7 +177,7 @@
                                                   (hash-set e a t)) ;;; add a binding from a to t
                                            (Fun-ret type))))
                            ;; #f because we don't know the lexical environement yet
-                     (cons (Let id (Closure rec? (if rec? (cdr args) args) (car expr) #f))
+                     (cons (Func id (Closure rec? (if rec? (cdr args) args) (car expr) #f))
                            (hash-set env id type))))))))
 
 
@@ -191,7 +191,7 @@
     ((Piter test body sp)
      (let ((ti (check-expr test env Bool))
            (b  (check-expr body env expected-type)))
-       (cons (Iter (car ti) (car b))
+       (cons (Loop (car ti) (car b))
              env)))
 
     ((Pident id sp)

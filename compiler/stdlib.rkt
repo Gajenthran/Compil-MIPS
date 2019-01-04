@@ -1,6 +1,6 @@
 #lang racket/base
 
-(require "astint.rkt")
+(require "ast.rkt")
 
 (provide (all-defined-out))
 
@@ -13,17 +13,17 @@
     (cons 'tl    (Fun (Lst Any) (list (Lst Any))))
     (cons 'nullp (Fun Bool (list (Lst Any))))
     
-    (cons '+     (Fun Int (list Int Int)))
-    (cons '-     (Fun Int (list Int Int)))
-    (cons '*     (Fun Int (list Int Int)))
-    (cons '/     (Fun Int (list Int Int)))
-    (cons '%     (Fun Int (list Int Int)))
-    (cons 'zerop (Fun Bool (list Int)))
+    (cons 'Add    (Fun Int (list Int Int)))
+    (cons 'Sub    (Fun Int (list Int Int)))
+    (cons 'Mult   (Fun Int (list Int Int)))
+    (cons 'Div    (Fun Int (list Int Int)))
+    (cons 'Modulo (Fun Int (list Int Int)))
+    (cons 'zerop  (Fun Bool (list Int)))
     
-    (cons '== (Fun Bool (list Int Int)))
-    (cons '!= (Fun Bool (list Int Int)))
-    (cons '<  (Fun Bool (list Int Int)))
-    (cons '>  (Fun Bool (list Int Int)))
+    (cons 'Eq (Fun Bool (list Int Int)))
+    (cons 'Neq (Fun Bool (list Int Int)))
+    (cons 'Lt  (Fun Bool (list Int Int)))
+    (cons 'Gt  (Fun Bool (list Int Int)))
     (cons '<= (Fun Bool (list Int Int)))
     (cons '>= (Fun Bool (list Int Int)))
     
@@ -35,12 +35,12 @@
     (cons 'print_bool (Fun Nil (list Bool)))
     (cons 'print_str  (Fun Nil (list Str)))
     (cons 'print_lst  (Fun Nil (list Any)))
-   ;; (cons 'printf     (Fun Nil Any))            ;; TODO : compilator with variable arguments?
     
     (cons 'strcat (Fun Str (list Str Str)))
     (cons 'atoi   (Fun Int (list Str))))))
 
 ;;; Values of the function in te standard library
+;;; A retirer ou adapter avec le compilateur
 (define *stdlib*
   (make-immutable-hash
    (list
@@ -49,23 +49,23 @@
     (cons 'tl    cdr)
     (cons 'nullp null?)
     
-    (cons '+     +)
-    (cons '-     -)
-    (cons '*     *)
-    (cons '/     /)
-    (cons '%     modulo)
+    (cons 'Add     +)
+    (cons 'Sub     -)
+    (cons 'Mult     *)
+    (cons 'Div     /)
+    (cons 'Modulo     modulo)
     (cons 'zerop zero?)
     
-    (cons '== =)
-    (cons '!= (lambda (a b) (not (= a b))))
-    (cons '<  <)
-    (cons '>  >)
+    (cons 'Eq =)
+    (cons 'Neq (lambda (a b) (not (= a b))))
+    (cons 'Lt  <)
+    (cons 'Gt  >)
     (cons '<= <=)
     (cons '>= >=)
     
     (cons 'and (lambda (a b) (and a b)))
     (cons 'or  (lambda (a b) (or a b)))
-    (cons 'not not)
+    (cons '! not)
     
     (cons 'print_num  displayln)
     (cons 'print_bool displayln)

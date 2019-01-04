@@ -2,7 +2,7 @@
 
 (require parser-tools/yacc
          "lexer.rkt"
-         "astint.rkt")
+         "ast.rkt")
 
 (provide liec-parser)
 
@@ -48,7 +48,7 @@
 
     (expr
      ((definition)          $1)
-     ((funcall)             $1)        ;; TODO
+     ((funcall Lsc)         $1)        ;; TODO
      ((test)                $1)
      ((iter)                $1)
      ((Lopar expr Lcpar)    $2)
@@ -63,10 +63,10 @@
      ((Lwhile Lopar sexpr Lcpar expr) (Piter $3 $5 (sp 1))))
 
     (test
-     ((Lif Lopar sexpr Lcpar expr Lelse expr) (Pcond $3 $5 $7 (sp 1))))
+     ((Lif Lopar sexpr Lcpar expr Lelse expr) (Pcond $3 $5 $7 (sp 1)))) ;; TODO : if/else if/else - with option?
 
     (funcall
-     ((Lident Lopar args Lcpar Lsc) (Pcall $1 $3 (sp 1)))) ;; Put Lsc here
+     ((Lident Lopar args Lcpar) (Pcall $1 $3 (sp 1))))
 
     (args
      ((sexpr Lcom args) (cons $1 $3))
@@ -76,19 +76,19 @@
      ((atom)              $1)
      ((funcall)           $1)
      ((operation)         $1)
-     ((Lopar sexpr Lcpar)  $2))
+     ((Lopar sexpr Lcpar) $2))
 
     (operation
      ((sexpr Ladd sexpr) (Pcall 'Add (list $1 $3) (sp 1)))
      ((sexpr Lsub sexpr) (Pcall 'Sub (list $1 $3) (sp 1)))
      ((sexpr Lmul sexpr) (Pcall 'Mult (list $1 $3) (sp 1)))
-     ((sexpr Ldiv sexpr) (Pcall '/ (list $1 $3) (sp 1)))
-     ((sexpr Lmod sexpr) (Pcall '% (list $1 $3) (sp 1)))
+     ((sexpr Ldiv sexpr) (Pcall 'Div (list $1 $3) (sp 1)))
+     ((sexpr Lmod sexpr) (Pcall 'Modulo (list $1 $3) (sp 1)))
 
-     ((sexpr Leq sexpr)  (Pcall '== (list $1 $3) (sp 1)))
-     ((sexpr Lneq sexpr) (Pcall '!= (list $1 $3) (sp 1)))
-     ((sexpr Llt sexpr)  (Pcall '<  (list $1 $3) (sp 1)))
-     ((sexpr Lgt sexpr)  (Pcall '>  (list $1 $3) (sp 1)))
+     ((sexpr Leq sexpr)  (Pcall 'Eq (list $1 $3) (sp 1)))
+     ((sexpr Lneq sexpr) (Pcall 'Neq (list $1 $3) (sp 1)))
+     ((sexpr Llt sexpr)  (Pcall 'Lt  (list $1 $3) (sp 1)))
+     ((sexpr Lgt sexpr)  (Pcall 'Gt  (list $1 $3) (sp 1)))
      ((sexpr Llte sexpr) (Pcall '<= (list $1 $3) (sp 1)))
      ((sexpr Lgte sexpr) (Pcall '>= (list $1 $3) (sp 1)))
 

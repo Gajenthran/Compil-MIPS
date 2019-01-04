@@ -1,5 +1,5 @@
-0	g746	=	(g747)
-1	g747	=	(prog Leof)
+0	g666	=	(g667)
+1	g667	=	(prog Leof)
 2	prog	=	(definition prog)
 3	prog	=	(definition)
 4	definition	=	(type Lident Lassign sexpr Lsc)
@@ -56,22 +56,22 @@
 55	elem	=	(sexpr)
 56	elem	=	()
 State 0
-	g746 -> . g747 
+	g666 -> . g667 
 
-	g747					goto	1
 	definition					goto	3
 	Lrec					shift	5
+	g667					goto	1
 	type					goto	4
 	prog					goto	2
 	Lident					shift	6
 	Ltype					shift	7
 
 State 1
-	g746 -> g747 . 
+	g666 -> g667 . 
 
 
 State 2
-	g747 -> prog . Leof 
+	g667 -> prog . Leof 
 
 	Leof					accept	
 
@@ -115,7 +115,7 @@ State 7
 	Lcpar					reduce	9
 
 State 8
-	g747 -> prog Leof . 
+	g667 -> prog Leof . 
 
 
 State 9

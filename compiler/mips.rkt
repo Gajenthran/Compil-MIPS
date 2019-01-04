@@ -9,7 +9,7 @@
 (struct Addi (rd rs i))
 (struct Add (rd rs1 rs2))
 (struct Sub (rd rs1 rs2))
-(struct Mult (rs1 rs2))
+(struct Mul (rs1 rs2))
 (struct Div (rs1 rs2))
 (struct Lo (rd))
 (struct Seq (rd rs1 rs2))

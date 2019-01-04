@@ -13,12 +13,14 @@
 
 (require racket/match
          "mips.rkt"
-         "../interpreter/parser.rkt"
-         "../interpreter/semantics.rkt"
-         "../interpreter/eval.rkt"
-         "../interpreter/eval.rkt"
-         "../interpreter/stdlib.rkt"
-         "ast.rkt")
+         "ast.rkt"
+         "parser.rkt"
+         "semantics.rkt"
+         "stdlib.rkt")
+
+(provide mips-data)
+(provide mips-emit)
+(provide comp)
 
 ;;;;; compilateur Python vers MIPS
 ;; la convention utilisée dans ce compilateur est
@@ -36,7 +38,7 @@
 
 (define (comp ast env fp-sp) ;; le décalage entre sp et fp est fp - sp
   (match ast
-    ((Nil)
+    ((Null)
      ;; On représente Nil par l'adresse 0 (comme NULL en C)
      (comp (Const 0) env fp-sp))
 
@@ -104,8 +106,8 @@
               (Add 'v0 't0 't1))
              ((equal? symbol 'Sub)
               (Sub 'v0 't0 't1))
-             ((equal? symbol 'Mult)
-              (Mult 't0 't1)
+             ((equal? symbol 'Mul)
+              (Mul 't0 't1)
               (Lo 'v0)) ;;;  v: Seulement une seule opération
              ((equal? symbol 'Div)
               (Div 't0 't1)
@@ -177,14 +179,19 @@
     ;; Bloc d'instructions utilisé pour le corps des conditions, 
     ;; des boucles, ou des fonctions. A FAIRE!
     ((Block body)
-     (append
-      (comp (car body) env fp-sp)
-      (comp (car (cdr body)) env fp-sp)))
+     (apply append (map (lambda (expr)
+             (comp expr env fp-sp))
+          body)))
+
+  ;;  ((Func id closure)
   ;;   (append
-  ;;    (map (lambda (expr)
-  ;;            (displayln expr))
-  ;;            ;;(comp expr env fp-sp))
-  ;;         body)))
+  ;;    (list (Label id))
+  ;;    (comp closure (hash-set env id (Mem fp-sp 'fp)) fp-sp)
+  ;;    (list (Jr 'ra))))
+
+    ((Closure rec? args body _)
+     (append
+      (comp body env fp-sp)))
 
     ((Let n v)
      ;; Variable locale : let n = v in e
@@ -224,7 +231,7 @@
     ((Addi rd rs i)   (printf "addi $~a, $~a, ~a\n" rd rs i))
     ((Add rd rs1 rs2) (printf "add $~a, $~a, $~a\n" rd rs1 rs2))
     ((Sub rd rs1 rs2) (printf "sub $~a, $~a, $~a\n" rd rs1 rs2))
-    ((Mult rs1 rs2)   (printf "mult $~a, $~a\n" rs1 rs2))
+    ((Mul rs1 rs2)    (printf "mul $~a, $~a\n" rs1 rs2))
     ((Div rs1 rs2)    (printf "div $~a, $~a\n" rs1 rs2))
     ((Lo rd)          (printf "mflo $~a\n" rd))
     ((Seq rd rs1 rs2) (printf "seq $~a, $~a, $~a\n" rd rs1 rs2))
@@ -246,32 +253,18 @@
                    (printf "~a: .asciiz ~s\n" k v)))
   (printf "\n.text\n.globl main\nmain:\n"))
 
-#|(define argv (current-command-line-arguments))
-(cond
-  ((>= (vector-length argv) 1)
-   (define in (open-input-file (vector-ref argv 0)))
-   (port-count-lines! in)
-   (define parsed (liec-parser in))
-   (close-input-port in)
 
-   (define prog (check-exprs parsed (make-immutable-hash) Nil))
-   (displayln (car (car prog)))
-   
-   (define ret (comp (car (car prog)) (make-immutable-hash) 0))
-   (displayln ret)) 
-  
-  (else
-   (eprintf "Usage: racket liec.rkt <source.liec>\n")
-   (exit 1))) |#
-
-(mips-data (make-hash '((str_123 . "coucou") (nl . "\n"))))
-(for-each mips-emit
+;; (mips-data (make-hash '((str_123 . "coucou") (nl . "\n"))))
+#| (for-each mips-emit
           (append
            ;; On initialise notre environnement local :
            (list (Move 'fp 'sp))
 
            ;; On compile une expression :
-           (comp (Block (list (Let 'nbo (Const 18)) (Nil)))
+           (comp 
+                 ;;(Func 'toto (Closure #f (Const 99) (Block (list (Let 'nbo (Const 11)) (Const 24))) (make-immutable-hash)))
+                 (Op 'Add (Op 'Add (Const 4) (Const 1)) (Const 5))
+                 ;;(Block (list (Let 'bobo (Const 18)) (Null)))
                  ;;(Block (list (Const 18) (Const 24)))
                  ;;(Op 'Div (Const 14) (Const 11))
                  ;;(Cond (Test 'Gt (Const 14) (Const 11)) (Let 'nbo (Const 93)) (Const 28))
@@ -301,4 +294,4 @@
                  ;;(Li 'v0 4)
                  ;; main return 0
                  (Li 'v0 0)
-                 (Jr 'ra))))
+                 (Jr 'ra)))) |#
