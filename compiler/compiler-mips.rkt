@@ -13,10 +13,7 @@
 
 (require racket/match
          "mips.rkt"
-         "ast.rkt"
-         "parser.rkt"
-         "semantics.rkt"
-         "stdlib.rkt")
+         "ast.rkt")
 
 (provide mips-data)
 (provide mips-emit)
@@ -29,8 +26,12 @@
 
 (define accLoop 0) ;; accumulateur pour les boucles
 (define accCond 0) ;; accumulateur pour les conditions
+(define accStr  0) ;; accumulateur pour les chaînes de caractères
 
 (provide comp)
+
+;; Fonction réalisant les incrémentations pour nos accumulateurs pris sur 
+;; https://stackoverflow.com
 (define-syntax increment
   (syntax-rules ()
     ((_ x)   (begin (set! x (+ x 1)) x))
@@ -43,8 +44,20 @@
      (comp (Const 0) env fp-sp))
 
     ((Const n)
-     ;; Constante entière mise dans v0
-     (list (Li 'v0 n)))
+     ;; Vérifier si il s'agit d'une chaîne. A continuer, mettre dans .data 
+     ;;(if (string? n)
+     ;; (increment accStr)
+     ;; (hash-set mips-data (string-append "str_" (number->string accStr)) n))
+
+     ;;; Matcher les valeurs obtenues par notre n.
+     (list (match n
+            ;; Si il s'agit d'une valeur booléenne, mettre soit 0 (false), soit 1 (true) afin
+            ;; de respecter la convention 
+            (boolean? (if (eq? n #t) 
+                           (Li 'v0 1)
+                           (Li 'v0 0)))
+            ;; Autres: donc il s'agit "forcément" d'un entier
+            (_ (Li 'v0 n)))))
 
     ((Data d)
      ;; Pointeur dans .data mis dans v0
@@ -101,20 +114,18 @@
       (list (Lw 't0 (Mem 0 'sp)) ;; on dépile v1
             (Addi 'sp 'sp 4)
             (Move 't1 'v0) ;; on récupère v2
-            (cond ;; On execute l'operation selon l'opérande
-             ((equal? symbol 'Add)
-              (Add 'v0 't0 't1))
-             ((equal? symbol 'Sub)
-              (Sub 'v0 't0 't1))
-             ((equal? symbol 'Mul)
-              (Mul 't0 't1)
-              (Lo 'v0)) ;;;  v: Seulement une seule opération
-             ((equal? symbol 'Div)
-              (Div 't0 't1)
-              (Lo 'v0))
-             (else
-              (eprintf ("Error: Not a correct operand."))
-              (exit 1))))))
+            (match symbol ;; On execute l'operation selon l'opérande
+             ('Add (Add 'v0 't0 't1))
+             ('Sub (Sub 'v0 't0 't1))
+             ('Mul (Mul 'v0 't0 't1))
+             ('Div (Div 'v0 't0 't1))
+             ('Eq  (Seq 't9 't0 't1))
+             ('Gt  (Sgt 't9 't0 't1))
+             ('Lt  (Slt 't9 't0 't1))))))
+
+    ((Call id args)
+     (append
+      (comp (Op id (car args) (car (cdr args))) env fp-sp)))
 
     ;; Test en prenant en paramètre le symbole de comparaison et deux valeurs
     ((Test symbol v1 v2)
@@ -183,18 +194,27 @@
              (comp expr env fp-sp))
           body)))
 
-  ;;  ((Func id closure)
-  ;;   (append
-  ;;    (list (Label id))
-  ;;    (comp closure (hash-set env id (Mem fp-sp 'fp)) fp-sp)
-  ;;    (list (Jr 'ra))))
+    ((Funblock body ret)
+     (append
+      (apply append (map (lambda (expr)
+              (comp expr env fp-sp))
+           body))
+      (comp ret env fp-sp)))
+
+    ((Func id closure)
+     (append
+      (list (Label id))
+      (when (eq? id 'main)
+       (list (Move 'fp 'sp)))
+      (comp closure (hash-set env id (Mem fp-sp 'fp)) fp-sp)
+      (list (Jr 'ra))))
 
     ((Closure rec? args body _)
      (append
       (comp body env fp-sp)))
 
     ((Let n v)
-     ;; Variable locale : let n = v in e
+     ;; Variable locale : let n = v
      (append
       ;; on compile v pour avoir sa valeur dans v0 :
       (comp v (hash-set env n (Mem fp-sp 'fp)) fp-sp)
@@ -231,8 +251,8 @@
     ((Addi rd rs i)   (printf "addi $~a, $~a, ~a\n" rd rs i))
     ((Add rd rs1 rs2) (printf "add $~a, $~a, $~a\n" rd rs1 rs2))
     ((Sub rd rs1 rs2) (printf "sub $~a, $~a, $~a\n" rd rs1 rs2))
-    ((Mul rs1 rs2)    (printf "mul $~a, $~a\n" rs1 rs2))
-    ((Div rs1 rs2)    (printf "div $~a, $~a\n" rs1 rs2))
+    ((Mul rd rs1 rs2) (printf "mul $~a, $~a, $~a\n" rd rs1 rs2))
+    ((Div rd rs1 rs2) (printf "div $~a, $~a, $~a\n" rd rs1 rs2))
     ((Lo rd)          (printf "mflo $~a\n" rd))
     ((Seq rd rs1 rs2) (printf "seq $~a, $~a, $~a\n" rd rs1 rs2))
     ((Sgt rd rs1 rs2) (printf "sgt $~a, $~a, $~a\n" rd rs1 rs2))
@@ -251,47 +271,6 @@
   (hash-for-each data
                  (lambda (k v)
                    (printf "~a: .asciiz ~s\n" k v)))
-  (printf "\n.text\n.globl main\nmain:\n"))
+  (printf "\n.text\n.globl main\n"))
 
-
-;; (mips-data (make-hash '((str_123 . "coucou") (nl . "\n"))))
-#| (for-each mips-emit
-          (append
-           ;; On initialise notre environnement local :
-           (list (Move 'fp 'sp))
-
-           ;; On compile une expression :
-           (comp 
-                 ;;(Func 'toto (Closure #f (Const 99) (Block (list (Let 'nbo (Const 11)) (Const 24))) (make-immutable-hash)))
-                 (Op 'Add (Op 'Add (Const 4) (Const 1)) (Const 5))
-                 ;;(Block (list (Let 'bobo (Const 18)) (Null)))
-                 ;;(Block (list (Const 18) (Const 24)))
-                 ;;(Op 'Div (Const 14) (Const 11))
-                 ;;(Cond (Test 'Gt (Const 14) (Const 11)) (Let 'nbo (Const 93)) (Const 28))
-                 ;;(Loop (Test 'Eq (Const 92) (Const 42)) (Const 33))
-                 ;;(Let 'a (Const 18))
-                 ;; ((Test 'Eq (Num 32) (Num 42))
-                 ;;       (Let 'b (Num 18))
-                 ;;       (Let 'b (Num 0))))
-
-                 ;; avec un environnement vide :
-                 (make-immutable-hash)
-                 ;; et fp-sp = 0 (vu que fp = sp à ce moment là) :
-                 0)
-
-
-           ;; On affiche le résultat, qui est dans v0
-           (list (Move 't5 'v0)
-                 (Li 'v0 1)
-                 (Move 'a0 't5)
-                 (Syscall)
-                 ;;(Move 'a0 'v0)
-                 ;;(Li 'v0 4) ;; 4 pour print_string qui est le type du résultat
-                 ;;(Syscall)
-                 ;; affichage retour à la ligne :
-                 ;;(La 'a0 (Lbl 'nl))
-                 ;;(Syscall)
-                 ;;(Li 'v0 4)
-                 ;; main return 0
-                 (Li 'v0 0)
-                 (Jr 'ra)))) |#
+(mips-data (make-hash '((str_123 . "coucou") (nl . "\n"))))

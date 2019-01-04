@@ -10,8 +10,8 @@
 ;; type id "=" expr
 (struct Pvardef (id expr type pos)          #:transparent)
 
-;;; Definition of variables
-;; "let" type id "=" expr
+;;; Redefinition of variables
+;; id "=" expr
 (struct Pvar    (id expr pos)				#:transparent)
 
 ;;; Definition of functions
@@ -27,12 +27,12 @@
 (struct Pcall   (id args pos)               #:transparent)
 
 ;;; Conditional branching
-;; "if" test "then" yes "else" no
+;; "if" test yes "else" no
 (struct Pcond   (test yes no pos)           #:transparent)
 
-;;; while iter
-;; "while" iter body
-(struct Piter   (test body pos)             #:transparent)
+;;; while loop
+;; "while" test body
+(struct Ploop   (test body pos)             #:transparent)
 
 ;;; Function block
 ;; "{" expr ( ";" expr )* return sexpr "}" 
@@ -48,7 +48,7 @@
 
 
 (struct Let (n v)                      #:transparent)
-(struct Func (id def)                  #:transparent)
+(struct Func (id closure)              #:transparent)
 (struct Var (n)                        #:transparent)
 (struct Cond (test yes no)             #:transparent)
 (struct Loop (test body)               #:transparent)
@@ -60,11 +60,9 @@
 (struct First (p)                      #:transparent)
 (struct Second (p)                     #:transparent)
 (struct Op (symbol v1 v2)              #:transparent)
-(struct Operand (symbol)           	   #:transparent)
 (struct Test (symbol v1 v2)            #:transparent)
-(struct Funblock (exprs ret)           #:transparent)
+(struct Funblock (body ret)            #:transparent)
 (struct Call    (id args)              #:transparent)
-;;(struct Func (id closure)		       #:transparent)
 (struct Closure (rec? args body env)   #:transparent)
 
 

@@ -50,7 +50,7 @@
      ((definition)          $1)
      ((funcall Lsc)         $1)        ;; TODO
      ((test)                $1)
-     ((iter)                $1)
+     ((loop)                $1)
      ((Lopar expr Lcpar)    $2)
      ((Locbra exprs Lccbra) (Pblock $2 (sp 1))))
 
@@ -59,8 +59,8 @@
      ((expr)       (list $1)))
 
     
-    (iter
-     ((Lwhile Lopar sexpr Lcpar expr) (Piter $3 $5 (sp 1))))
+    (loop
+     ((Lwhile Lopar sexpr Lcpar expr) (Ploop $3 $5 (sp 1))))
 
     (test
      ((Lif Lopar sexpr Lcpar expr Lelse expr) (Pcond $3 $5 $7 (sp 1)))) ;; TODO : if/else if/else - with option?
@@ -81,7 +81,7 @@
     (operation
      ((sexpr Ladd sexpr) (Pcall 'Add (list $1 $3) (sp 1)))
      ((sexpr Lsub sexpr) (Pcall 'Sub (list $1 $3) (sp 1)))
-     ((sexpr Lmul sexpr) (Pcall 'Mult (list $1 $3) (sp 1)))
+     ((sexpr Lmul sexpr) (Pcall 'Mul (list $1 $3) (sp 1)))
      ((sexpr Ldiv sexpr) (Pcall 'Div (list $1 $3) (sp 1)))
      ((sexpr Lmod sexpr) (Pcall 'Modulo (list $1 $3) (sp 1)))
 

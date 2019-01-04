@@ -188,7 +188,7 @@
        (cons (Cond (car t) (car y) (car n))
              env)))
 
-    ((Piter test body sp)
+    ((Ploop test body sp)
      (let ((ti (check-expr test env Bool))
            (b  (check-expr body env expected-type)))
        (cons (Loop (car ti) (car b))

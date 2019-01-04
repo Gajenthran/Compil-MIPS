@@ -17,21 +17,21 @@
    (define in (open-input-file (vector-ref argv 0)))
    (port-count-lines! in)
    (define parsed (liec-parser in))
-   (displayln "Parsing ok.")
    (close-input-port in)
 
-   (define prog (check-exprs parsed *stdlib-types* Nil))
+   ;;(define prog (check-exprs parsed *stdlib-types* Nil))
+   (define prog (liec-check parsed)); *stdlib-types* Nil))
    (displayln prog)
-   (mips-data (make-hash '((str_123 . "coucou") (nl . "\n"))))
+   ;;(mips-data (make-hash '((str_123 . "coucou") (nl . "\n"))))
    (for-each mips-emit
           (append
            ;; On initialise notre environnement local :
-           (list (Move 'fp 'sp))
+;;           (list (Move 'fp 'sp))
 
            ;; On compile une expression :
-           (comp (Block (car prog))
+           (comp (Block prog)
                  ;;(Func 'toto (Closure #f (Const 99) (Block (list (Let 'nbo (Const 11)) (Const 24))) (make-immutable-hash)))
-                 ;;(Op 'Add (Op 'Add (Const 4) (Const 1)) (Const 5))
+                 ;;(Op 'Add (Op 'Mul (Const 4) (Const 1)) (Const 5))
                  ;;(Block (list (Let 'bobo (Const 18)) (Null)))
                  ;;(Block (list (Const 18) (Const 24)))
                  ;;(Op 'Div (Const 14) (Const 11))

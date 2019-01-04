@@ -1,2 +1,4 @@
-int nbo = 9109;
-
+int main(argc, argv : int, str list) {
+	int toto = 12;
+	return 11;
+} 

@@ -15,7 +15,7 @@
     
     (cons 'Add    (Fun Int (list Int Int)))
     (cons 'Sub    (Fun Int (list Int Int)))
-    (cons 'Mult   (Fun Int (list Int Int)))
+    (cons 'Mul   (Fun Int (list Int Int)))
     (cons 'Div    (Fun Int (list Int Int)))
     (cons 'Modulo (Fun Int (list Int Int)))
     (cons 'zerop  (Fun Bool (list Int)))
@@ -51,7 +51,7 @@
     
     (cons 'Add     +)
     (cons 'Sub     -)
-    (cons 'Mult     *)
+    (cons 'Mul     *)
     (cons 'Div     /)
     (cons 'Modulo     modulo)
     (cons 'zerop zero?)
@@ -71,7 +71,6 @@
     (cons 'print_bool displayln)
     (cons 'print_str  displayln)
     (cons 'print_lst  displayln)
-    (cons 'printf     printf)
     
-    (cons 'strcat string-append)      ;; TODO : string.h functions
+    (cons 'strcat string-append)
     (cons 'atoi   string->number))))

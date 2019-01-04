@@ -65,7 +65,7 @@
    (":"         (token-Lcol))
    (","         (token-Lcom))
    ("if"        (token-Lif))
-   ("then"      (token-Lthen))
+   ("then"      (token-Lthen)) ;; TODO: A retirer!
    ("else"      (token-Lelse))
    ("{"         (token-Locbra))
    ("while"     (token-Lwhile))     ;; TODO : for loop 
