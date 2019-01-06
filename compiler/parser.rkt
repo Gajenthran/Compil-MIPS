@@ -21,6 +21,8 @@
 
    (grammar
     (prog
+     ((loop)             (list $1)) ;; A retirer !
+     ((test)             (list $1)) ;; A retirer !
      ((definition prog)  (cons $1 $2))
      ((definition)       (list $1)))
 

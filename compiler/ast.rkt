@@ -63,7 +63,8 @@
 (struct Test (symbol v1 v2)            #:transparent)
 (struct Funblock (body ret)            #:transparent)
 (struct Call    (id args)              #:transparent)
-(struct Closure (rec? args body env)   #:transparent)
+(struct Systcall (id value)            #:transparent)
+(struct Closure (rec? args body env)   #:transparent) 
 
 
 ;;; Types

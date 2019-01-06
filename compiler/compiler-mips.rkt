@@ -1,21 +1,16 @@
 ;;; Faire les fonctions
 ;;; Les conditions
 ;;; Les boucles
-;;; Wrapper l'ensemble des opérations
-;;; Wrapper l'ensemble des comparaisons
-;;; Ecrire un bloc d'instructions
-;;; Opérations ne fonctionnent pas
-;;; Appels systèmes de SPIM
-;;; Conditions considérant une seule instruction
+;;; Tous les signes à mettres
 
 
 #lang racket/base
 
 (require racket/match
+         racket/list
          "mips.rkt"
          "ast.rkt")
 
-(provide mips-data)
 (provide mips-emit)
 (provide comp)
 
@@ -30,8 +25,8 @@
 
 (provide comp)
 
-;; Fonction réalisant les incrémentations pour nos accumulateurs pris sur 
-;; https://stackoverflow.com
+;; Fonction réalisant les incrémentations pour nos accumulateurs récupérée 
+;; sur https://stackoverflow.com
 (define-syntax increment
   (syntax-rules ()
     ((_ x)   (begin (set! x (+ x 1)) x))
@@ -49,15 +44,20 @@
      ;; (increment accStr)
      ;; (hash-set mips-data (string-append "str_" (number->string accStr)) n))
 
-     ;;; Matcher les valeurs obtenues par notre n.
-     (list (match n
-            ;; Si il s'agit d'une valeur booléenne, mettre soit 0 (false), soit 1 (true) afin
-            ;; de respecter la convention 
-            (boolean? (if (eq? n #t) 
-                           (Li 'v0 1)
-                           (Li 'v0 0)))
-            ;; Autres: donc il s'agit "forcément" d'un entier
-            (_ (Li 'v0 n)))))
+     ;;; Vérifier la valeur obtenue dans notre n.
+     (list
+      (list 
+       (cond
+         ;; Si il s'agit d'une valeur booléenne, mettre soit 0 (false), soit 1 (true) afin
+         ;; de respecter la convention 
+         ((boolean? n)
+          (if (eq? n #t) 
+           (Li 'v0 10)
+           (Li 'v0 100)))
+          ;; Autres: donc il s'agit "forcément" d'un entier
+          (else 
+           (Li 'v0 n))))
+      env))
 
     ((Data d)
      ;; Pointeur dans .data mis dans v0
@@ -101,70 +101,78 @@
       ;; on récupère le second élément dans v0
       (list (Lw 'v0 (Mem 4 'v0)))))
 
-    ;; Operation en prenant en paramètre l'opérande et deux valeurs
+    ;; Opération en prenant en paramètre l'opérande et deux valeurs.
+    ;; Il s'agit d'instructions arithmétiques mais également de comparaisons
     ((Op symbol v1 v2)
-     (append
+     ;; compiler la première valeur et la deuxième valeur
+     (define cv1 (comp v1 env fp-sp))
+     (define cv2 (comp v2 env fp-sp))
+     (list
+      (append
 
-      (comp v1 env fp-sp)
-      (list (Addi 'sp 'sp -4)
-            (Sw 'v0 (Mem 0 'sp)))
-        
-      (comp v2 env (- fp-sp 4))
-      
-      (list (Lw 't0 (Mem 0 'sp)) ;; on dépile v1
-            (Addi 'sp 'sp 4)
-            (Move 't1 'v0) ;; on récupère v2
-            (match symbol ;; On execute l'operation selon l'opérande
-             ('Add (Add 'v0 't0 't1))
-             ('Sub (Sub 'v0 't0 't1))
-             ('Mul (Mul 'v0 't0 't1))
-             ('Div (Div 'v0 't0 't1))
-             ('Eq  (Seq 't9 't0 't1))
-             ('Gt  (Sgt 't9 't0 't1))
-             ('Lt  (Slt 't9 't0 't1))))))
+       (first cv1)
+       (list (Addi 'sp 'sp -4)
+             (Sw 'v0 (Mem 0 'sp)))
+         
+       (first cv2)
+       
+       (list (Lw 't0 (Mem 0 'sp)) ;; on dépile v1
+             (Addi 'sp 'sp 4)
+             (Move 't1 'v0) ;; on récupère v2
+             (match symbol ;; On execute l'operation selon l'opérande
+              ('Add (Add 'v0 't0 't1))
+              ('Sub (Sub 'v0 't0 't1))
+              ('Mul (Mul 'v0 't0 't1))
+              ('Div (Div 'v0 't0 't1))
+              ('Eq  (Seq 't9 't0 't1))
+              ('Gt  (Sgt 't9 't0 't1))
+              ('Lt  (Slt 't9 't0 't1)))))
+      env))
 
+
+    ;; Appels systèmes. Pour l'instant, seulement pour l'affichage
+    ((Systcall id value)
+     (define cval (comp value env fp-sp))
+     (list
+      (append
+       (first cval)
+       (match id
+        ('print_num (list (Move 'a0 'v0) (Li 'v0 1) (Syscall)))
+        ('print_str (list (La 'a0 Lbl value) (Li 'v0 4) (Syscall)))))
+      env))
+
+    ;; Appel de fonction qui peuvent être des fonctions déclarées par l'utilisateur (pas encore
+    ;; implémenté) ou des fonctions natives (appel systèmes ou opérations)
     ((Call id args)
-     (append
-      (comp (Op id (car args) (car (cdr args))) env fp-sp)))
-
-    ;; Test en prenant en paramètre le symbole de comparaison et deux valeurs
-    ((Test symbol v1 v2)
-     (append
-      (comp v1 env fp-sp)
-      (list (Addi 'sp 'sp -4)
-            (Sw 'v0 (Mem 0 'sp)))
-
-      (comp v2 env (- fp-sp 4))
-
-      (list (Lw 't0 (Mem 0 'sp))
-            (Addi 'sp 'sp 4)
-            (Move 't1 'v0)
-            (cond
-             ((equal? symbol 'Eq)
-              (Seq 't9 't0 't1))
-             ((equal? symbol 'Gt)
-              (Sgt 't9 't0 't1))
-             ((equal? symbol 'Lt)
-              (Slt 't9 't0 't1))
-             (else
-              (eprintf ("Error: Not a correct comparison instruction"))
-              (exit 1))))))
-
+     ;; Expression compilée qui va soit être un appel système, soit une opération
+     (let ((ce 
+      (if (eq? id (or 'print_num 'print_str))
+        (comp (Systcall id (car args)) env fp-sp)
+        (comp (Op id (car args) (car (cdr args))) env fp-sp))))
+     (list
+      (append (first ce))
+      second ce)))
 
     ;; Boucle qui compile d'abord le test puis va sur le label endloop 
     ;; si le test vaut 0 sinon on continue sur le label loop avec des
     ;; branchements vers le même label
     ((Loop test body)
      (increment accLoop)
-     (append
-      (comp test env fp-sp)
-      (list (Addi 'sp 'sp -4)
-            (Sw 'v0 (Mem 0 'sp)))
-      (list (Label (string-append "loop_" (number->string accLoop)))
-            (Beqz 't9 (string-append "endloop_" (number->string accLoop))))
-      (comp body env (- fp-sp 4))
-      (list (B (string-append "loop_" (number->string accLoop))))
-      (list (Label (string-append "endloop_" (number->string accLoop))))))
+     (define ctest (comp test env fp-sp))
+     (define cbody (comp body env (- fp-sp 4)))
+     (list
+      (append
+       ;; Compilation de l'expression pour le test
+       (first ctest)
+       (list (Addi 'sp 'sp -4)
+             (Sw 'v0 (Mem 0 'sp)))
+       (list (Label (string-append "loop_" (number->string accLoop)))
+             (Beqz 't9 (string-append "endloop_" (number->string accLoop))))
+       ;; Compilation de l'expression pour le corps de la boucle
+       (first cbody)
+       (list (B (string-append "loop_" (number->string accLoop))))
+       (list (Label (string-append "endloop_" (number->string accLoop)))))
+      (second cbody)))
 
     ;; Condition qui compile d'abord le test puis va sur le label then ou else 
     ;; Et une fois fini continue les instructions sur le label endif
@@ -187,54 +195,74 @@
 
       (list (Label (string-append "endif_" (number->string accCond))))))
 
-    ;; Bloc d'instructions utilisé pour le corps des conditions, 
-    ;; des boucles, ou des fonctions. A FAIRE!
-    ((Block body)
-     (apply append (map (lambda (expr)
-             (comp expr env fp-sp))
-          body)))
 
-    ((Funblock body ret)
-     (append
-      (apply append (map (lambda (expr)
-              (comp expr env fp-sp))
-           body))
-      (comp ret env fp-sp)))
-
+    ;;; Déclaration d'une fonction composé de id (nom de la fonction) et 
+    ;;; de sa clôture
     ((Func id closure)
-     (append
-      (list (Label id))
-      (when (eq? id 'main)
-       (list (Move 'fp 'sp)))
-      (comp closure (hash-set env id (Mem fp-sp 'fp)) fp-sp)
-      (list (Jr 'ra))))
+     (define ce (comp closure (hash-set env id (Mem fp-sp 'fp)) fp-sp))
+     (list
+      (append
+       (if (eq? id 'main)
+        (list (Label '_main)) ;; Main déjà existant
+        (list (Label id)))
+       (first ce)
+       (list (Jr 'ra)))
+      (second ce)))
 
+    ;; Clôture... A faire !
     ((Closure rec? args body _)
-     (append
-      (comp body env fp-sp)))
+     ;; Expression compilée avec 2 éléments: 1- instructions MIPS, 2- environnement
+     (define ce (comp body env fp-sp))
+     (list
+      (append
+       (first ce))
+      (second ce)))
 
+    ;; Bloc de fonction qui agit comme un bloc classique mais qui retourne également 
+    ;; une valeur (A faire !)
+    ((Funblock body ret)
+     (foldl (lambda (expr acc)
+              (let ((ce (comp expr (second acc) fp-sp)))
+                (list (append (first acc)
+                               (first ce))
+                       (second ce))))
+            (list '() env)
+            body))
+
+    ;; Bloc d'instructions utilisé pour le corps des conditions, 
+    ;; des boucles, ou des fonctions.
+    ((Block body)
+     ;; On compile chaque expression en mettant dans une liste composée
+     ;; de deux éléments : 1- l'expression MIPS, 2- l'environnement
+     (foldl (lambda (expr acc)
+              (let ((ce (comp expr (second acc) fp-sp)))
+                (list (append (first acc)
+                               (first ce))
+                       (second ce))))
+            (list '() env)
+            body))
+
+
+    ;; Déclaration d'une variable
     ((Let n v)
-     ;; Variable locale : let n = v
-     (append
-      ;; on compile v pour avoir sa valeur dans v0 :
-      (comp v (hash-set env n (Mem fp-sp 'fp)) fp-sp)
-      ;; on empile la variable locale :
-      (list (Addi 'sp 'sp -4)
-            (Sw 'v0 (Mem 0 'sp)))))
+     ;; Compilation de la valeur v 
+     (define ce (comp v (hash-set env n (Mem fp-sp 'fp)) fp-sp))
 
-      ;; à partir de là fp - sp a grandi de 4 :
-  #|    (let ((fp-sp (- fp-sp 4)))
-        ;; on compile e pour le mettre dans v0 :
-        (comp e
-              ;; en associant n à son adresse dans la pile par rapport
-              ;; à fp, pour que cette adresse soit fixe
-              (hash-set env n (Mem fp-sp 'fp))
-              fp-sp)))) |#
+     (list
+      (append
+       ;; on récupère seulement l'instruction MIPS
+       (first ce)
+       ;; on empile la variable locale :
+       (list (Addi 'sp 'sp -4)
+             (Sw 'v0 (Mem 0 'sp))))
+      (second ce)))
 
+    ;; Référence à une variable
     ((Var n)
-     ;; Référence à une variable
      ;; on met la valeur de la variable dans v0 :
-     (list (Lw 'v0 (hash-ref env n))))))
+     (list
+      (list (Lw 'v0 (hash-ref env n)))
+      env))))
 
 
 
@@ -271,6 +299,6 @@
   (hash-for-each data
                  (lambda (k v)
                    (printf "~a: .asciiz ~s\n" k v)))
-  (printf "\n.text\n.globl main\n"))
+  (printf "\n.text\n.globl main\nmain:\n")) ;; A RETIRER!
 
 (mips-data (make-hash '((str_123 . "coucou") (nl . "\n"))))
