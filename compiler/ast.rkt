@@ -48,6 +48,7 @@
 
 
 (struct Let (n v)                      #:transparent)
+(struct Vardef (n v)                   #:transparent)
 (struct Func (id closure)              #:transparent)
 (struct Var (n)                        #:transparent)
 (struct Cond (test yes no)             #:transparent)

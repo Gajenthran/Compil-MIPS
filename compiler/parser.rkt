@@ -81,22 +81,22 @@
      ((Lopar sexpr Lcpar) $2))
 
     (operation
-     ((sexpr Ladd sexpr) (Pcall 'Add (list $1 $3) (sp 1)))
-     ((sexpr Lsub sexpr) (Pcall 'Sub (list $1 $3) (sp 1)))
-     ((sexpr Lmul sexpr) (Pcall 'Mul (list $1 $3) (sp 1)))
-     ((sexpr Ldiv sexpr) (Pcall 'Div (list $1 $3) (sp 1)))
-     ((sexpr Lmod sexpr) (Pcall 'Modulo (list $1 $3) (sp 1)))
+     ((sexpr Ladd sexpr) (Pcall '+ (list $1 $3) (sp 1)))
+     ((sexpr Lsub sexpr) (Pcall '- (list $1 $3) (sp 1)))
+     ((sexpr Lmul sexpr) (Pcall '* (list $1 $3) (sp 1)))
+     ((sexpr Ldiv sexpr) (Pcall '/ (list $1 $3) (sp 1)))
+     ((sexpr Lmod sexpr) (Pcall '% (list $1 $3) (sp 1)))
 
-     ((sexpr Leq sexpr)  (Pcall 'Eq (list $1 $3) (sp 1)))
-     ((sexpr Lneq sexpr) (Pcall 'Neq (list $1 $3) (sp 1)))
-     ((sexpr Llt sexpr)  (Pcall 'Lt  (list $1 $3) (sp 1)))
-     ((sexpr Lgt sexpr)  (Pcall 'Gt  (list $1 $3) (sp 1)))
+     ((sexpr Leq sexpr)  (Pcall '== (list $1 $3) (sp 1)))
+     ((sexpr Lneq sexpr) (Pcall '!= (list $1 $3) (sp 1)))
+     ((sexpr Llt sexpr)  (Pcall '<  (list $1 $3) (sp 1)))
+     ((sexpr Lgt sexpr)  (Pcall '>  (list $1 $3) (sp 1)))
      ((sexpr Llte sexpr) (Pcall '<= (list $1 $3) (sp 1)))
      ((sexpr Lgte sexpr) (Pcall '>= (list $1 $3) (sp 1)))
 
-     ((sexpr Land sexpr) (Pcall 'and (list $1 $3) (sp 1)))
-     ((sexpr Lor sexpr)  (Pcall 'or  (list $1 $3) (sp 1)))
-     ((Lnot sexpr)       (Pcall 'not (list $2) (sp 1)))
+     ((sexpr Land sexpr) (Pcall '&& (list $1 $3) (sp 1)))
+     ((sexpr Lor sexpr)  (Pcall '|| (list $1 $3) (sp 1)))
+     ((Lnot sexpr)       (Pcall '!  (list $2) (sp 1)))
 
      ((sexpr Lcc sexpr)  (Pcall 'cons (list $1 $3) (sp 1))))
 

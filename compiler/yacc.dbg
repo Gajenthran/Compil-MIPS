@@ -1,5 +1,5 @@
-0	g698	=	(g699)
-1	g699	=	(prog Leof)
+0	g701	=	(g702)
+1	g702	=	(prog Leof)
 2	prog	=	(loop)
 3	prog	=	(test)
 4	prog	=	(definition prog)
@@ -58,26 +58,26 @@
 57	elem	=	(sexpr)
 58	elem	=	()
 State 0
-	g698 -> . g699 
+	g701 -> . g702 
 
-	g699					goto	1
+	definition					goto	3
 	Lrec					shift	7
 	Ltype					shift	11
 	Lwhile					shift	9
 	type					goto	4
 	prog					goto	2
-	definition					goto	3
+	Lident					shift	10
 	Lif					shift	8
 	loop					goto	5
-	Lident					shift	10
 	test					goto	6
+	g702					goto	1
 
 State 1
-	g698 -> g699 . 
+	g701 -> g702 . 
 
 
 State 2
-	g699 -> prog . Leof 
+	g702 -> prog . Leof 
 
 	Leof					accept	
 
@@ -145,7 +145,7 @@ State 11
 	Lcpar					reduce	11
 
 State 12
-	g699 -> prog Leof . 
+	g702 -> prog Leof . 
 
 
 State 13

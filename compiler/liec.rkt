@@ -18,8 +18,6 @@
    (port-count-lines! in)
    (define parsed (liec-parser in))
    (close-input-port in)
-
-   ;;(define prog (check-exprs parsed *stdlib-types* Nil))
    (define prog (liec-check parsed))
    ;;(displayln prog)
 
@@ -61,8 +59,7 @@
                  ;;(Li 'v0 4)
                  ;; main return 0
                  (Li 'v0 0)
-                 (Jr 'ra)))))
-  
+                 (Jr 'ra)))))  
   (else
    (eprintf "Usage: racket liec.rkt <source.liec>\n")
    (exit 1)))

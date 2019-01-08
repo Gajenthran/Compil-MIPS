@@ -1,7 +1,9 @@
 ;;; Faire les fonctions
-;;; Les conditions
-;;; Les boucles
 ;;; Tous les signes à mettres
+;;; Ajouter plus d'opérations
+;;; Référence à la variable
+;;; Cloture + Appel de fonction
+;;; Chaîne de caractères
 
 
 #lang racket/base
@@ -22,7 +24,7 @@
 (define accLoop 0) ;; accumulateur pour les boucles
 (define accCond 0) ;; accumulateur pour les conditions
 (define accStr  0) ;; accumulateur pour les chaînes de caractères
-
+(define data (make-immutable-hash))
 (provide comp)
 
 ;; Fonction réalisant les incrémentations pour nos accumulateurs récupérée 
@@ -36,24 +38,28 @@
   (match ast
     ((Null)
      ;; On représente Nil par l'adresse 0 (comme NULL en C)
-     (comp (Const 0) env fp-sp))
+     (define cnull (comp (Const 0) env fp-sp))
+     (list 
+      (list 
+       (first cnull))
+      (second env)))
 
     ((Const n)
-     ;; Vérifier si il s'agit d'une chaîne. A continuer, mettre dans .data 
-     ;;(if (string? n)
-     ;; (increment accStr)
-     ;; (hash-set mips-data (string-append "str_" (number->string accStr)) n))
-
      ;;; Vérifier la valeur obtenue dans notre n.
      (list
       (list 
        (cond
+         ;; Si il s'agit d'une chaîne, mettre dans .data et faire Lw. A faire !
+         ((string? n)
+          (increment accStr)
+          (hash-set data (string-append "str_" (number->string accStr)) n)
+          (La 'v0 (Lbl n)))
          ;; Si il s'agit d'une valeur booléenne, mettre soit 0 (false), soit 1 (true) afin
          ;; de respecter la convention 
          ((boolean? n)
           (if (eq? n #t) 
-           (Li 'v0 10)
-           (Li 'v0 100)))
+           (Li 'v0 1)
+           (Li 'v0 0)))
           ;; Autres: donc il s'agit "forcément" d'un entier
           (else 
            (Li 'v0 n))))
@@ -61,7 +67,9 @@
 
     ((Data d)
      ;; Pointeur dans .data mis dans v0
-     (list (La 'v0 (Lbl d))))
+     (list
+      (list (La 'v0 (Lbl d)))
+      env))
 
     ((Pair a b)
      ;; Paire (a . b)
@@ -120,13 +128,16 @@
              (Addi 'sp 'sp 4)
              (Move 't1 'v0) ;; on récupère v2
              (match symbol ;; On execute l'operation selon l'opérande
-              ('Add (Add 'v0 't0 't1))
-              ('Sub (Sub 'v0 't0 't1))
-              ('Mul (Mul 'v0 't0 't1))
-              ('Div (Div 'v0 't0 't1))
-              ('Eq  (Seq 't9 't0 't1))
-              ('Gt  (Sgt 't9 't0 't1))
-              ('Lt  (Slt 't9 't0 't1)))))
+              ('+  (Add 'v0 't0 't1))
+              ('-  (Sub 'v0 't0 't1))
+              ('*  (Mul 'v0 't0 't1))
+              ('/  (Div 'v0 't0 't1))
+              ('== (Seq 't9 't0 't1))
+              ('!= (Sne 't9 't0 't1))
+              ('>  (Sgt 't9 't0 't1))
+              ('<  (Slt 't9 't0 't1))
+              ('>= (Sge 't9 't0 't1))
+              ('<= (Sle 't9 't0 't1)))))
       env))
 
 
@@ -158,17 +169,18 @@
     ;; branchements vers le même label
     ((Loop test body)
      (increment accLoop)
+     ;; On compile le test puis le corps de la boucle
      (define ctest (comp test env fp-sp))
      (define cbody (comp body env (- fp-sp 4)))
      (list
       (append
-       ;; Compilation de l'expression pour le test
+       ;; Instructions MIPS pour le test
        (first ctest)
        (list (Addi 'sp 'sp -4)
              (Sw 'v0 (Mem 0 'sp)))
        (list (Label (string-append "loop_" (number->string accLoop)))
              (Beqz 't9 (string-append "endloop_" (number->string accLoop))))
-       ;; Compilation de l'expression pour le corps de la boucle
+       ;; Instructions MIPS pour le corps de la boucle
        (first cbody)
        (list (B (string-append "loop_" (number->string accLoop))))
        (list (Label (string-append "endloop_" (number->string accLoop)))))
@@ -178,49 +190,61 @@
     ;; Et une fois fini continue les instructions sur le label endif
     ((Cond test yes no)
      (increment accCond)
-     (append
-      ;; On compile d'abord le test 
-      (comp test env fp-sp)
-      (list (Addi 'sp 'sp -4)
-            (Sw 'v0 (Mem 0 'sp)))
-      (list (Bnez 't9 (string-append "then_" (number->string accCond))) ;; paramètre yes à utiliser
-            (Beqz 't9 (string-append "else_" (number->string accCond))))
+     ;;; On compile le test, le bloc then et le bloc else
+     (define ctest (comp test env fp-sp))
+     (define cyes (comp yes env (- fp-sp 4)))
+     (define cno (comp no env (- fp-sp 8)))
 
-      (list (Label (string-append "then_" (number->string accCond))))
-      (comp yes env (- fp-sp 4))
-      (list (B (string-append "endif_" (number->string accCond))))
+     (list
+      (append
+       ;; On ajoute les instructions MIPS du test
+       (first ctest)
+       (list (Addi 'sp 'sp -4)
+             (Sw 'v0 (Mem 0 'sp)))
+       (list (Bnez 't9 (string-append "then_" (number->string accCond))) ;; paramètre yes à utiliser
+             (Beqz 't9 (string-append "else_" (number->string accCond))))
 
-      (list (Label (string-append "else_" (number->string accCond))))
-      (comp no env (- fp-sp 8))
+       (list (Label (string-append "then_" (number->string accCond))))
+       ;; On ajoute les instructions MIPS du bloc then
+       (first cyes)
+       (list (B (string-append "endif_" (number->string accCond))))
 
-      (list (Label (string-append "endif_" (number->string accCond))))))
+       (list (Label (string-append "else_" (number->string accCond))))
+       ;; On ajoute les instructions MIPS du bloc else
+       (first cno)
+
+       ;; On continue sur le label endif la suite du programme
+       (list (Label (string-append "endif_" (number->string accCond)))))
+      env))
 
 
     ;;; Déclaration d'une fonction composé de id (nom de la fonction) et 
     ;;; de sa clôture
     ((Func id closure)
-     (define ce (comp closure (hash-set env id (Mem fp-sp 'fp)) fp-sp))
+     (define cclosure (comp closure (hash-set env id (Mem fp-sp 'fp)) fp-sp))
      (list
       (append
        (if (eq? id 'main)
         (list (Label '_main)) ;; Main déjà existant
         (list (Label id)))
-       (first ce)
+       (first cclosure)
        (list (Jr 'ra)))
-      (second ce)))
+      (second cclosure)))
 
     ;; Clôture... A faire !
     ((Closure rec? args body _)
      ;; Expression compilée avec 2 éléments: 1- instructions MIPS, 2- environnement
-     (define ce (comp body env fp-sp))
+     (define cbody (comp body env fp-sp))
      (list
       (append
-       (first ce))
-      (second ce)))
+       (first cbody))
+      (second cbody)))
 
     ;; Bloc de fonction qui agit comme un bloc classique mais qui retourne également 
     ;; une valeur (A faire !)
     ((Funblock body ret)
+     ;; On compile chaque expression en mettant dans une liste composée
+     ;; de deux éléments : 1- l'expression MIPS, 2- l'environnement
      (foldl (lambda (expr acc)
               (let ((ce (comp expr (second acc) fp-sp)))
                 (list (append (first acc)
@@ -243,22 +267,24 @@
             body))
 
 
-    ;; Déclaration d'une variable
+    ;; Re/Déclaration d'une variable
     ((Let n v)
-     ;; Compilation de la valeur v 
-     (define ce (comp v (hash-set env n (Mem fp-sp 'fp)) fp-sp))
+     ;; On compile la valeur v en mettant dans une liste composée
+     ;; de deux éléments : 1- l'expression MIPS, 2- l'environnement
+     (define cv (comp v (hash-set env n (Mem (- fp-sp 4) 'fp)) (- fp-sp 4)))
 
      (list
       (append
        ;; on récupère seulement l'instruction MIPS
-       (first ce)
+       (first cv)
        ;; on empile la variable locale :
        (list (Addi 'sp 'sp -4)
              (Sw 'v0 (Mem 0 'sp))))
-      (second ce)))
+      (second cv)))
 
     ;; Référence à une variable
     ((Var n)
+     (display n)
      ;; on met la valeur de la variable dans v0 :
      (list
       (list (Lw 'v0 (hash-ref env n)))
@@ -283,8 +309,12 @@
     ((Div rd rs1 rs2) (printf "div $~a, $~a, $~a\n" rd rs1 rs2))
     ((Lo rd)          (printf "mflo $~a\n" rd))
     ((Seq rd rs1 rs2) (printf "seq $~a, $~a, $~a\n" rd rs1 rs2))
+    ((Sne rd rs1 rs2) (printf "sne $~a, $~a, $~a\n" rd rs1 rs2))
     ((Sgt rd rs1 rs2) (printf "sgt $~a, $~a, $~a\n" rd rs1 rs2))
     ((Slt rd rs1 rs2) (printf "slt $~a, $~a, $~a\n" rd rs1 rs2))
+    ((Sle rd rs1 rs2) (printf "sle $~a, $~a, $~a\n" rd rs1 rs2))
+    ((Sge rd rs1 rs2) (printf "sge $~a, $~a, $~a\n" rd rs1 rs2))
+    ((And rd rs1 rs2) (printf "and $~a, $~a, $~a\n" rd rs1 rs2))
     ((B l)            (printf "b ~a\n" l))
     ((Bnez rs l)      (printf "bnez $~a, ~a\n" rs l))
     ((Beqz rs l)      (printf "beqz $~a, ~a\n" rs l))
@@ -301,4 +331,4 @@
                    (printf "~a: .asciiz ~s\n" k v)))
   (printf "\n.text\n.globl main\nmain:\n")) ;; A RETIRER!
 
-(mips-data (make-hash '((str_123 . "coucou") (nl . "\n"))))
+(mips-data data)
