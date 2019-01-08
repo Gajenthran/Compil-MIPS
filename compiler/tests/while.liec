@@ -1,4 +1,11 @@
+/*
+ * Vérification de la boucle while
+ */
 int main(argc, argv : int, str list) {
-  str a = "toto";
+	int a = 10;
+	while(a == 10) {   // Pour lancer, le programme est censé afficher 1 à l'infini
+		print_num(1);
+		// a = 2
+	}
   return 0;
 }

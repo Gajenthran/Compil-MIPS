@@ -16,7 +16,7 @@
 (provide mips-emit)
 (provide comp)
 
-;;;;; compilateur Python vers MIPS
+;;;;; Compilateur Python vers MIPS
 ;; la convention utilisée dans ce compilateur est
 ;; de toujours mettre la valeur calculée dans $v0 
 ;; et de placer dans $t9 la valeur des tests
@@ -36,6 +36,7 @@
 
 (define (comp ast env fp-sp) ;; le décalage entre sp et fp est fp - sp
   (match ast
+
     ((Null)
      ;; On représente Nil par l'adresse 0 (comme NULL en C)
      (define cnull (comp (Const 0) env fp-sp))
@@ -50,10 +51,10 @@
       (list 
        (cond
          ;; Si il s'agit d'une chaîne, mettre dans .data et faire Lw. A faire !
-         ((string? n)
-          (increment accStr)
-          (hash-set data (string-append "str_" (number->string accStr)) n)
-          (La 'v0 (Lbl n)))
+       ;;  ((string? n)
+        ;;  (increment accStr)
+        ;;  (hash-set data (string-append "str_" (number->string accStr)) n)
+        ;;  (La 'v0 (Lbl n)))
          ;; Si il s'agit d'une valeur booléenne, mettre soit 0 (false), soit 1 (true) afin
          ;; de respecter la convention 
          ((boolean? n)
@@ -156,12 +157,16 @@
     ;; implémenté) ou des fonctions natives (appel systèmes ou opérations)
     ((Call id args)
      ;; Expression compilée qui va soit être un appel système, soit une opération
-     (let ((ce 
+     ;; (define cargs (comp args env fp-sp))
+     (let ((ce
+      ;; (if (eq? id Closure))
       (if (eq? id (or 'print_num 'print_str))
         (comp (Systcall id (car args)) env fp-sp)
         (comp (Op id (car args) (car (cdr args))) env fp-sp))))
-     (list
-      (append (first ce))
+
+      (list
+       (append 
+        (first ce))
       second ce)))
 
     ;; Boucle qui compile d'abord le test puis va sur le label endloop 
@@ -227,8 +232,7 @@
        (if (eq? id 'main)
         (list (Label '_main)) ;; Main déjà existant
         (list (Label id)))
-       (first cclosure)
-       (list (Jr 'ra)))
+       (first cclosure))
       (second cclosure)))
 
     ;; Clôture... A faire !
@@ -241,17 +245,33 @@
       (second cbody)))
 
     ;; Bloc de fonction qui agit comme un bloc classique mais qui retourne également 
-    ;; une valeur (A faire !)
+    ;; une valeur dans v0
     ((Funblock body ret)
      ;; On compile chaque expression en mettant dans une liste composée
      ;; de deux éléments : 1- l'expression MIPS, 2- l'environnement
-     (foldl (lambda (expr acc)
+
+     ;; On compile dans un premier temps le corps de la fonction
+     (define cbody (foldl (lambda (expr acc)
               (let ((ce (comp expr (second acc) fp-sp)))
                 (list (append (first acc)
-                               (first ce))
+                              (first ce))
                        (second ce))))
             (list '() env)
             body))
+
+     ;; On compile la valeur de retour de la fonction et on 
+     ;; la place dans v0
+     (define cret (comp ret env fp-sp))
+
+     ;; On ajoute les deux expressions compilées en ajoutant l'environnement
+     ;; au corps de la fonction 
+     (list
+      (append
+        (first cbody)
+        (first cret)
+        (list (Jr 'ra)))
+      (second cbody)))
+
 
     ;; Bloc d'instructions utilisé pour le corps des conditions, 
     ;; des boucles, ou des fonctions.
@@ -261,7 +281,7 @@
      (foldl (lambda (expr acc)
               (let ((ce (comp expr (second acc) fp-sp)))
                 (list (append (first acc)
-                               (first ce))
+                              (first ce))
                        (second ce))))
             (list '() env)
             body))
@@ -284,7 +304,6 @@
 
     ;; Référence à une variable
     ((Var n)
-     (display n)
      ;; on met la valeur de la variable dans v0 :
      (list
       (list (Lw 'v0 (hash-ref env n)))
@@ -315,6 +334,7 @@
     ((Sle rd rs1 rs2) (printf "sle $~a, $~a, $~a\n" rd rs1 rs2))
     ((Sge rd rs1 rs2) (printf "sge $~a, $~a, $~a\n" rd rs1 rs2))
     ((And rd rs1 rs2) (printf "and $~a, $~a, $~a\n" rd rs1 rs2))
+    ((Or rd rs1 rs2)  (printf "or $~a, $~a, $~a\n" rd rs1 rs2))
     ((B l)            (printf "b ~a\n" l))
     ((Bnez rs l)      (printf "bnez $~a, ~a\n" rs l))
     ((Beqz rs l)      (printf "beqz $~a, ~a\n" rs l))
@@ -329,6 +349,6 @@
   (hash-for-each data
                  (lambda (k v)
                    (printf "~a: .asciiz ~s\n" k v)))
-  (printf "\n.text\n.globl main\nmain:\n")) ;; A RETIRER!
+  (printf "\n.text\n.globl main\nmain:\n")) ;; Peut-être à enlever
 
 (mips-data data)

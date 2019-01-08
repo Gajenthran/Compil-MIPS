@@ -1,3 +1,16 @@
+/* 
+ * Fichier permettant de montrer les conditions if
+ * et else (avec possibilité de mettre une seule
+ * instruction ou plusieurs)
+ */
 int main(argc, argv : int, str list) {
+	int a = 10;
+	if((10 != 10))
+		print_num(1); // Affiche un 1, synonyme de vrai
+	else {
+		print_num(0);
+		print_num(0); // Affiche un 1, synonyme de faux
+	}
 
+	return 0;
 }

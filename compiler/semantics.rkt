@@ -8,9 +8,6 @@
                   (position-col posc)))
 
 (provide liec-check)
-(provide check-expr)
-(provide check-exprs)
-
 
 ;;; Helper functions
 ;;; ----------------
@@ -128,10 +125,8 @@
          ;; be of the expected type of the block / list of expression.
          (l (check-expr last-expr (cdr ce) Any)))
 
-    ;; return the block with always the same format : a pair of 1- the list of
-    ;; checked expression and 2- the current environment
-      ;;(displayln last-expr)
-      ;; (displayln "")
+      ;; return the block with always the same format : a pair of 1- the list of
+      ;; checked expression and 2- the current environment
       (cons (append (car ce) (list (car l)))
             (cdr l))))
 

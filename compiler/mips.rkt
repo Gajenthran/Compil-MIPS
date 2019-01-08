@@ -2,7 +2,7 @@
 
 (provide (all-defined-out))
 
-
+;; Instructions MIPS
 (struct Move (rd rs))
 (struct Li (r i))
 (struct La (r a))
@@ -20,6 +20,7 @@
 (struct Sle (rd rs1 rs2))
 (struct And (rd rs1 rs2))
 (struct Not (rd rs1 rs2))
+(struct Or  (rd rs1 rs2))
 (struct B (l))
 (struct Beqz (rs l))
 (struct Bnez (rs l))

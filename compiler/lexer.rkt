@@ -24,7 +24,7 @@
    Land Lor Lnot Lxor))
 
 (define-empty-tokens punctuations
-  (Lsc Lcc Lopar Lcpar Lobra Lcbra
+  (Lsc Lopar Lcpar Lobra Lcbra
    Locbra Lccbra Lcol Lcom Llist))
 
 (define-tokens atoms
@@ -65,7 +65,6 @@
    (":"         (token-Lcol))
    (","         (token-Lcom))
    ("if"        (token-Lif))
-   ("then"      (token-Lthen)) ;; TODO: A retirer!
    ("else"      (token-Lelse))
    ("{"         (token-Locbra))
    ("while"     (token-Lwhile))     ;; TODO : for loop 
@@ -86,14 +85,13 @@
    ("||"        (token-Lor))
    ("!"         (token-Lnot))
    (";"         (token-Lsc))
-   ("::"        (token-Lcc))
    ("("         (token-Lopar))
    (")"         (token-Lcpar))
    ("["         (token-Lobra))
    ("]"         (token-Lcbra))
    ("()"        (token-Lnil))
    (types       (token-Ltype (string->symbol lexeme)))
-   ("list"      (token-Llist))                            ;; Lstar without list? 
+   ("list"      (token-Llist)) 
    (bool        (token-Lbool (string=? "true" lexeme)))
    (number      (token-Lnum (string->number lexeme)))
    ("\""        (token-Lstr (apply string-append (string-lexer input-port))))
