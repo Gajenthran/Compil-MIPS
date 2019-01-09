@@ -1,10 +1,9 @@
 ;;; Faire les fonctions
-;;; Tous les signes à mettres
+;;; Tous les signes à mettre
 ;;; Ajouter plus d'opérations
 ;;; Référence à la variable
 ;;; Cloture + Appel de fonction
 ;;; Chaîne de caractères
-
 
 #lang racket/base
 
@@ -34,9 +33,8 @@
     ((_ x)   (begin (set! x (+ x 1)) x))
     ((_ x n) (begin (set! x (+ x n)) x))))
 
-(define (comp ast env fp-sp) ;; le décalage entre sp et fp est fp - sp
-  (match ast
-
+(define (comp expr env fp-sp) ;; le décalage entre sp et fp est fp - sp
+  (match expr
     ((Null)
      ;; On représente Nil par l'adresse 0 (comme NULL en C)
      (define cnull (comp (Const 0) env fp-sp))
@@ -50,11 +48,12 @@
      (list
       (list 
        (cond
-         ;; Si il s'agit d'une chaîne, mettre dans .data et faire Lw. A faire !
-       ;;  ((string? n)
-        ;;  (increment accStr)
-        ;;  (hash-set data (string-append "str_" (number->string accStr)) n)
-        ;;  (La 'v0 (Lbl n)))
+         ;;  Si il s'agit d'une chaîne, mettre dans .data et faire Lw. A faire !
+         ;;  ((string? n)
+         ;;  (increment accStr)
+         ;;  (hash-set data (string-append "str_" (number->string accStr)) n)
+         ;;  (La 'v0 (Lbl n))) ;; pas n mais le str_ qui contient n
+         
          ;; Si il s'agit d'une valeur booléenne, mettre soit 0 (false), soit 1 (true) afin
          ;; de respecter la convention 
          ((boolean? n)

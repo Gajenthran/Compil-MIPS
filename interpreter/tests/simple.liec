@@ -1,21 +1,2 @@
-int nbo = 99;
+print_num(99);
 
-/*int setnb(to : int) {
-	int it = 10;
-	return nbo;
-} */
-
-int main(argc, argv : int, str list) {
-/*	int nb = 10;
-
-	if(nb <= 10) {
-		nb = 1;
-	}
-
-	else
-		nb = nb - 1;
-	setnb(100);
-	print_num(nb); */
-	str car = "foo";
-	return nbo;
-}

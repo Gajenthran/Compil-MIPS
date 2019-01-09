@@ -13,12 +13,12 @@
     (cons 'tl    (Fun (Lst Any) (list (Lst Any))))
     (cons 'nullp (Fun Bool (list (Lst Any))))
     
-    (cons '+    (Fun Int (list Int Int)))
-    (cons '-    (Fun Int (list Int Int)))
-    (cons '*    (Fun Int (list Int Int)))
-    (cons '/    (Fun Int (list Int Int)))
-    (cons '%    (Fun Int (list Int Int)))
-    (cons 'zerop  (Fun Bool (list Int)))
+    (cons '+     (Fun Int (list Int Int)))
+    (cons '-     (Fun Int (list Int Int)))
+    (cons '*     (Fun Int (list Int Int)))
+    (cons '/     (Fun Int (list Int Int)))
+    (cons '%     (Fun Int (list Int Int)))
+    (cons 'zerop (Fun Bool (list Int)))
     
     (cons '== (Fun Bool (list Int Int)))
     (cons '!= (Fun Bool (list Int Int)))

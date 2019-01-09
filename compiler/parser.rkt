@@ -27,10 +27,10 @@
     (definition
      ((type Lident Lassign sexpr Lsc)                           (Pvardef $2 $4 $1 (sp 2)))
      ((Lident Lassign sexpr Lsc)                                (Pvar    $1 $3 (sp 2))) 
-     ((type Lident Lopar fargs Lcol argtypes Lcpar fblock)      (Pfundef #f $2 $4 $8 (Fun $1 $6) (sp 2)))
-     ((Lrec type Lident Lopar fargs Lcol argtypes Lcpar fblock) (Pfundef #t $3 $5 $9 (Fun $2 $7) (sp 3))))
+     ((type Lident Lopar argtypes Lcol fargs Lcpar fblock)      (Pfundef #f $2 $6 $8 (Fun $1 $4) (sp 2)))
+     ((Lrec type Lident Lopar argtypes Lcol fargs Lcpar fblock) (Pfundef #t $3 $7 $9 (Fun $2 $5) (sp 3))))
      ;; Not the right structure for a function in C
-
+     
     (type
      ((type Llist) (Lst $1))
      ((Ltype)      $1))
@@ -98,12 +98,12 @@
      ((Lnot sexpr)       (Pcall '!  (list $2) (sp 1))))
 
     (atom
-     ((Lnil)             (Pconst 'nil '() (sp 1)))
-     ((Lbool)            (Pconst 'bool $1 (sp 1)))
-     ((Lnum)             (Pconst 'int $1 (sp 1)))
-     ((Lstr)             (Pconst 'str $1 (sp 1)))
-     ((Lident)           (Pident $1 (sp 1)))
-     ((Lobra elem Lcbra) $2))
+     ((Lnil)               (Pconst 'nil '() (sp 1)))
+     ((Lbool)              (Pconst 'bool $1 (sp 1)))
+     ((Lnum)               (Pconst 'int $1 (sp 1)))
+     ((Lstr)               (Pconst 'str $1 (sp 1)))
+     ((Lident)             (Pident $1 (sp 1)))
+     ((Locbra elem Lccbra) $2))
 
     (elem
      ((sexpr Lcom elem) (Pcall 'cons (list $1 $3) (sp 1)))

@@ -2,7 +2,9 @@
 
 (require "parser.rkt"
          "semantics.rkt"
-         "eval.rkt")
+         "eval.rkt"
+         "ast.rkt"
+         "stdlib.rkt")
 
 (define argv (current-command-line-arguments))
 (cond
@@ -15,10 +17,11 @@
 
    (define prog (liec-check parsed))
    (printf "Typing ok.\n")
-   (displayln prog))
 
-   ;; (define ret (liec-eval prog))
-   ;; (displayln ret))
+   (define ret (liec-eval prog))
+   (newline)
+   (exit ret))
+
   
   (else
    (eprintf "Usage: racket liec.rkt <source.liec>\n")

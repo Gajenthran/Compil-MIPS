@@ -3,7 +3,7 @@
  * l'affichage d'un nombre ou d'une chaîne de
  * caractère
  */
-int main(argc, argv : int, str list) {
+int main(int, str list : argc, argv) {
   print_num(12);
   // print_str("nl");
   return 0;

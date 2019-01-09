@@ -3,7 +3,7 @@
  * opérations (addition, soustractions, division,
  * multiplication, priorité)
  */
-int main(argc, argv : int, str list) {
+int main(int, str list : argc, argv) {
   print_num(2 + 2);       // Ret:4
   print_num(2 + 3 - 5);   // Enchaînement de plusieurs calculs - Ret:0
   print_num(2 + 2 * 2);   // Priorité multiplication - Ret:0

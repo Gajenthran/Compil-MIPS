@@ -32,7 +32,7 @@
 
 ;;; while iter
 ;; "while" iter body
-(struct Piter   (test body pos)             #:transparent)
+(struct Ploop   (test body pos)             #:transparent)
 
 ;;; Function block
 ;; "{" expr ( ";" expr )* return sexpr "}" 
@@ -45,6 +45,8 @@
 ;;; Constant values
 ;; value
 (struct Pconst  (type value pos)            #:transparent)
+
+
 
 
 ;;; Syntactic structures for our internal representation (AST)
@@ -74,13 +76,18 @@
 ;; Evaluates to <yes> if <test> evaluates to true, otherwise evaluates to <no>.
 (struct Cond    (test yes no)               #:transparent)
 
-(struct Iter    (iter body)                 #:transparent)
+;;; Loop
+;; Evaluates to <body> if <test> evaluates to true
+(struct Loop    (test body)                 #:transparent)
 
 ;;; Block
 ;; Evaluates to the value of last expression in the list <exprs>. Previous
 ;; expressions are evaluated for their side-effect (binding, printing, …).
 (struct Block   (exprs)                            #:transparent)
 
+;;; Funcblock
+;; Evaluates to the value of last expression in the list <exprs>. Previous
+;; expressions are evaluated for their side-effect (binding, printing, …).
 (struct Funblock (exprs ret)                     #:transparent)
 
 ;;; Constant value

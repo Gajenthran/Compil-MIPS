@@ -27,7 +27,6 @@
     (definition
      ((type Lident Lassign sexpr Lsc)                           (Pvardef $2 $4 $1 (sp 2)))
      ((Lident Lassign sexpr Lsc)                                (Pvar    $1 $3 (sp 2)))
-     ;; ((Lident operation Lassign sexpr Lsc)                      (Pvar    $1 $3 (sp 2))) ;; TODO: a += 10; 
      ((type Lident Lopar fargs Lcol argtypes Lcpar fblock)      (Pfundef #f $2 $4 $8 (Fun $1 $6) (sp 2)))
      ((Lrec type Lident Lopar fargs Lcol argtypes Lcpar fblock) (Pfundef #t $3 $5 $9 (Fun $2 $7) (sp 3))))
 
@@ -61,7 +60,7 @@
 
     
     (iter
-     ((Lwhile Lopar sexpr Lcpar expr) (Piter $3 $5 (sp 1))))
+     ((Lwhile Lopar sexpr Lcpar expr) (Ploop $3 $5 (sp 1))))
 
     (test
      ((Lif Lopar sexpr Lcpar expr Lelse expr) (Pcond $3 $5 $7 (sp 1)))) ;; TODO : if/else if/else - with option?
@@ -77,7 +76,7 @@
      ((atom)              $1)
      ((funcall)           $1)
      ((operation)         $1)
-     ((Lopar sexpr Lcpar)  $2))
+     ((Lopar sexpr Lcpar) $2))
 
     (operation
      ((sexpr Ladd sexpr) (Pcall '+ (list $1 $3) (sp 1)))
@@ -100,12 +99,12 @@
      ((sexpr Lcc sexpr)  (Pcall 'cons (list $1 $3) (sp 1))))
 
     (atom
-     ((Lnil)             (Pconst 'nil '() (sp 1)))
-     ((Lbool)            (Pconst 'bool $1 (sp 1)))
-     ((Lnum)             (Pconst 'int $1 (sp 1)))
-     ((Lstr)             (Pconst 'str $1 (sp 1)))
-     ((Lident)           (Pident $1 (sp 1)))
-     ((Lobra elem Lcbra) $2))
+     ((Lnil)               (Pconst 'nil '() (sp 1)))
+     ((Lbool)              (Pconst 'bool $1 (sp 1)))
+     ((Lnum)               (Pconst 'int $1 (sp 1)))
+     ((Lstr)               (Pconst 'str $1 (sp 1)))
+     ((Lident)             (Pident $1 (sp 1)))
+     ((Locbra elem Lccbra) $2))
 
     (elem
      ((sexpr Lcom elem) (Pcall 'cons (list $1 $3) (sp 1)))

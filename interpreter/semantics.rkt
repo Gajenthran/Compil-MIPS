@@ -8,6 +8,8 @@
                   (position-col posc)))
 
 (provide liec-check)
+(provide check-expr)
+(provide check-exprs)
 
 
 ;;; Helper functions
@@ -34,15 +36,7 @@
     ('bool "bool")
     ('nil "nil")
     ('any "any")
-    ((Lst t) (format "~a list" (fmt-type t)))
-    ((Fun r a) (format "~a~a <- ~a~a"
-                       (if p? "(" "")
-                       (fmt-type r)
-                       (foldl (lambda (t fmt)
-                                (string-append fmt ", " (fmt-type t #t)))
-                              (fmt-type (car a) #t)
-                              (cdr a))
-                       (if p? ")" "")))))
+    ((Lst t) (format "~a list" (fmt-type t)))))
 
 ;;; User type error
 (define (errt pos expected-type actual-type)
@@ -128,8 +122,6 @@
 
     ;; return the block with always the same format : a pair of 1- the list of
     ;; checked expression and 2- the current environment
-      ;;(displayln last-expr)
-      ;; (displayln "")
       (cons (append (car ce) (list (car l)))
             (cdr l))))
 
@@ -186,10 +178,10 @@
        (cons (Cond (car t) (car y) (car n))
              env)))
 
-    ((Piter test body sp)
+    ((Ploop test body sp)
      (let ((ti (check-expr test env Bool))
            (b  (check-expr body env expected-type)))
-       (cons (Iter (car ti) (car b))
+       (cons (Loop (car ti) (car b))
              env)))
 
     ((Pident id sp)

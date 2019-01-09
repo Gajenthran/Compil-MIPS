@@ -1,55 +1,31 @@
-/* 
- * Nombre à virgule
- * Alternative (avec option)
- * Argument d'une fonction
- * boucle while/for
- * portée des variables
- * bloc d'une fonction/structure de contrôle
- */
+str list lste = {"toto" , "popo"};
+int nb = 4 + 2 + 3;
 
-
-// str list lste = ["toto" , "popo"];
-int nb = 4;
-
-/* int square(n : int) {
-  n * n
-};
+int square(n : int) {
+  print_str("toto");
+  return n * n;
+}
 
 int setNb(n : int) {
   nb = n;
-  1
-};
-
-int max(m, n : int, int) {
-  if(m > n)
-    m
-  else
-    n
-};
+  return 1;
+}
 
 rec int fact(n, res: int, int) {
+  print_int(n);
     if(n <= 1) {
       print_str("récursion finie !\n");
-      res * n
     }
 
     else {
-      print_lst(lste);
+      // print_lst(lste);
       fact(n - 1, res * n);
-      res * n
-    }
-}; */
+  }
+  return res;
+}
 
 int main(argc, argv : int, str list) {
-  nb = 10;
-  while(!(nb < 5 && nb < 3)) {
-    nb = nb + 1;
-    print_num(nb);
-  }
-  
-  int toto = 2;
-  bool b = false;
-
-  // setNb(100);
-  return 999;
+  int a = 10;
+  print_int(12);
+  return 0;
 }

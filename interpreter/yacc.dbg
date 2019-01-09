@@ -51,20 +51,20 @@
 50	atom	=	(Lnum)
 51	atom	=	(Lstr)
 52	atom	=	(Lident)
-53	atom	=	(Lobra elem Lcbra)
+53	atom	=	(Locbra elem Lccbra)
 54	elem	=	(sexpr Lcom elem)
 55	elem	=	(sexpr)
 56	elem	=	()
 State 0
 	g639 -> . g640 
 
-	definition					goto	3
+	g640					goto	1
 	Lrec					shift	5
 	type					goto	4
 	prog					goto	2
 	Lident					shift	6
 	Ltype					shift	7
-	g640					goto	1
+	definition					goto	3
 
 State 1
 	g639 -> g640 . 
@@ -150,6 +150,7 @@ State 13
 
 	Lopar					shift	23
 	atom					goto	20
+	Locbra					shift	24
 	Lnil					shift	21
 	Lnum					shift	26
 	funcall					goto	17
@@ -157,7 +158,6 @@ State 13
 	Lident					shift	25
 	Lbool					shift	28
 	operation					goto	19
-	Lobra					shift	24
 	Lstr					shift	27
 	sexpr					goto	18
 
@@ -166,6 +166,7 @@ State 14
 
 	Lopar					shift	23
 	atom					goto	20
+	Locbra					shift	24
 	Lnil					shift	21
 	Lnum					shift	26
 	funcall					goto	17
@@ -173,7 +174,6 @@ State 14
 	Lident					shift	25
 	Lbool					shift	28
 	operation					goto	19
-	Lobra					shift	24
 	Lstr					shift	27
 	sexpr					goto	29
 
@@ -205,7 +205,7 @@ State 17
 	Lmod					reduce	30
 	Lsc					reduce	30
 	Land					reduce	30
-	Lcbra					reduce	30
+	Lccbra					reduce	30
 	Ladd					reduce	30
 	Lcom					reduce	30
 	Lcpar					reduce	30
@@ -260,7 +260,7 @@ State 19
 	Lmod					reduce	31
 	Lsc					reduce	31
 	Land					reduce	31
-	Lcbra					reduce	31
+	Lccbra					reduce	31
 	Ladd					reduce	31
 	Lcom					reduce	31
 	Lcpar					reduce	31
@@ -282,7 +282,7 @@ State 20
 	Lmod					reduce	29
 	Lsc					reduce	29
 	Land					reduce	29
-	Lcbra					reduce	29
+	Lccbra					reduce	29
 	Ladd					reduce	29
 	Lcom					reduce	29
 	Lcpar					reduce	29
@@ -304,7 +304,7 @@ State 21
 	Lmod					reduce	48
 	Lsc					reduce	48
 	Land					reduce	48
-	Lcbra					reduce	48
+	Lccbra					reduce	48
 	Ladd					reduce	48
 	Lcom					reduce	48
 	Lcpar					reduce	48
@@ -315,6 +315,7 @@ State 22
 
 	Lopar					shift	23
 	atom					goto	20
+	Locbra					shift	24
 	Lnil					shift	21
 	Lnum					shift	26
 	funcall					goto	17
@@ -322,7 +323,6 @@ State 22
 	Lident					shift	25
 	Lbool					shift	28
 	operation					goto	19
-	Lobra					shift	24
 	Lstr					shift	27
 	sexpr					goto	49
 
@@ -331,6 +331,7 @@ State 23
 
 	Lopar					shift	23
 	atom					goto	20
+	Locbra					shift	24
 	Lnil					shift	21
 	Lnum					shift	26
 	funcall					goto	17
@@ -338,26 +339,25 @@ State 23
 	Lident					shift	25
 	Lbool					shift	28
 	operation					goto	19
-	Lobra					shift	24
 	Lstr					shift	27
 	sexpr					goto	50
 
 State 24
-	atom -> Lobra . elem Lcbra 
+	atom -> Locbra . elem Lccbra 
 
 	atom					goto	20
 	Lnum					shift	26
 	funcall					goto	17
 	Lident					shift	25
+	Lstr					shift	27
 	sexpr					goto	51
-	Lopar					shift	23
-	Lcbra					reduce	56
+	Locbra					shift	24
 	Lnil					shift	21
+	Lccbra					reduce	56
 	Lnot					shift	22
 	elem					goto	52
 	operation					goto	19
-	Lobra					shift	24
-	Lstr					shift	27
+	Lopar					shift	23
 	Lbool					shift	28
 
 State 25
@@ -377,7 +377,7 @@ State 25
 	Lmod					reduce	52
 	Lsc					reduce	52
 	Land					reduce	52
-	Lcbra					reduce	52
+	Lccbra					reduce	52
 	Ladd					reduce	52
 	Lopar					shift	53
 	Lcom					reduce	52
@@ -400,7 +400,7 @@ State 26
 	Lmod					reduce	50
 	Lsc					reduce	50
 	Land					reduce	50
-	Lcbra					reduce	50
+	Lccbra					reduce	50
 	Ladd					reduce	50
 	Lcom					reduce	50
 	Lcpar					reduce	50
@@ -422,7 +422,7 @@ State 27
 	Lmod					reduce	51
 	Lsc					reduce	51
 	Land					reduce	51
-	Lcbra					reduce	51
+	Lccbra					reduce	51
 	Ladd					reduce	51
 	Lcom					reduce	51
 	Lcpar					reduce	51
@@ -444,7 +444,7 @@ State 28
 	Lmod					reduce	49
 	Lsc					reduce	49
 	Land					reduce	49
-	Lcbra					reduce	49
+	Lccbra					reduce	49
 	Ladd					reduce	49
 	Lcom					reduce	49
 	Lcpar					reduce	49
@@ -512,6 +512,7 @@ State 34
 
 	Lopar					shift	23
 	atom					goto	20
+	Locbra					shift	24
 	Lnil					shift	21
 	Lnum					shift	26
 	funcall					goto	17
@@ -519,7 +520,6 @@ State 34
 	Lident					shift	25
 	Lbool					shift	28
 	operation					goto	19
-	Lobra					shift	24
 	Lstr					shift	27
 	sexpr					goto	58
 
@@ -528,6 +528,7 @@ State 35
 
 	Lopar					shift	23
 	atom					goto	20
+	Locbra					shift	24
 	Lnil					shift	21
 	Lnum					shift	26
 	funcall					goto	17
@@ -535,7 +536,6 @@ State 35
 	Lident					shift	25
 	Lbool					shift	28
 	operation					goto	19
-	Lobra					shift	24
 	Lstr					shift	27
 	sexpr					goto	59
 
@@ -544,6 +544,7 @@ State 36
 
 	Lopar					shift	23
 	atom					goto	20
+	Locbra					shift	24
 	Lnil					shift	21
 	Lnum					shift	26
 	funcall					goto	17
@@ -551,7 +552,6 @@ State 36
 	Lident					shift	25
 	Lbool					shift	28
 	operation					goto	19
-	Lobra					shift	24
 	Lstr					shift	27
 	sexpr					goto	60
 
@@ -560,6 +560,7 @@ State 37
 
 	Lopar					shift	23
 	atom					goto	20
+	Locbra					shift	24
 	Lnil					shift	21
 	Lnum					shift	26
 	funcall					goto	17
@@ -567,7 +568,6 @@ State 37
 	Lident					shift	25
 	Lbool					shift	28
 	operation					goto	19
-	Lobra					shift	24
 	Lstr					shift	27
 	sexpr					goto	61
 
@@ -576,6 +576,7 @@ State 38
 
 	Lopar					shift	23
 	atom					goto	20
+	Locbra					shift	24
 	Lnil					shift	21
 	Lnum					shift	26
 	funcall					goto	17
@@ -583,7 +584,6 @@ State 38
 	Lident					shift	25
 	Lbool					shift	28
 	operation					goto	19
-	Lobra					shift	24
 	Lstr					shift	27
 	sexpr					goto	62
 
@@ -592,6 +592,7 @@ State 39
 
 	Lopar					shift	23
 	atom					goto	20
+	Locbra					shift	24
 	Lnil					shift	21
 	Lnum					shift	26
 	funcall					goto	17
@@ -599,7 +600,6 @@ State 39
 	Lident					shift	25
 	Lbool					shift	28
 	operation					goto	19
-	Lobra					shift	24
 	Lstr					shift	27
 	sexpr					goto	63
 
@@ -608,6 +608,7 @@ State 40
 
 	Lopar					shift	23
 	atom					goto	20
+	Locbra					shift	24
 	Lnil					shift	21
 	Lnum					shift	26
 	funcall					goto	17
@@ -615,7 +616,6 @@ State 40
 	Lident					shift	25
 	Lbool					shift	28
 	operation					goto	19
-	Lobra					shift	24
 	Lstr					shift	27
 	sexpr					goto	64
 
@@ -624,6 +624,7 @@ State 41
 
 	Lopar					shift	23
 	atom					goto	20
+	Locbra					shift	24
 	Lnil					shift	21
 	Lnum					shift	26
 	funcall					goto	17
@@ -631,7 +632,6 @@ State 41
 	Lident					shift	25
 	Lbool					shift	28
 	operation					goto	19
-	Lobra					shift	24
 	Lstr					shift	27
 	sexpr					goto	65
 
@@ -640,6 +640,7 @@ State 42
 
 	Lopar					shift	23
 	atom					goto	20
+	Locbra					shift	24
 	Lnil					shift	21
 	Lnum					shift	26
 	funcall					goto	17
@@ -647,7 +648,6 @@ State 42
 	Lident					shift	25
 	Lbool					shift	28
 	operation					goto	19
-	Lobra					shift	24
 	Lstr					shift	27
 	sexpr					goto	66
 
@@ -656,6 +656,7 @@ State 43
 
 	Lopar					shift	23
 	atom					goto	20
+	Locbra					shift	24
 	Lnil					shift	21
 	Lnum					shift	26
 	funcall					goto	17
@@ -663,7 +664,6 @@ State 43
 	Lident					shift	25
 	Lbool					shift	28
 	operation					goto	19
-	Lobra					shift	24
 	Lstr					shift	27
 	sexpr					goto	67
 
@@ -672,6 +672,7 @@ State 44
 
 	Lopar					shift	23
 	atom					goto	20
+	Locbra					shift	24
 	Lnil					shift	21
 	Lnum					shift	26
 	funcall					goto	17
@@ -679,7 +680,6 @@ State 44
 	Lident					shift	25
 	Lbool					shift	28
 	operation					goto	19
-	Lobra					shift	24
 	Lstr					shift	27
 	sexpr					goto	68
 
@@ -688,6 +688,7 @@ State 45
 
 	Lopar					shift	23
 	atom					goto	20
+	Locbra					shift	24
 	Lnil					shift	21
 	Lnum					shift	26
 	funcall					goto	17
@@ -695,7 +696,6 @@ State 45
 	Lident					shift	25
 	Lbool					shift	28
 	operation					goto	19
-	Lobra					shift	24
 	Lstr					shift	27
 	sexpr					goto	69
 
@@ -704,6 +704,7 @@ State 46
 
 	Lopar					shift	23
 	atom					goto	20
+	Locbra					shift	24
 	Lnil					shift	21
 	Lnum					shift	26
 	funcall					goto	17
@@ -711,7 +712,6 @@ State 46
 	Lident					shift	25
 	Lbool					shift	28
 	operation					goto	19
-	Lobra					shift	24
 	Lstr					shift	27
 	sexpr					goto	70
 
@@ -736,6 +736,7 @@ State 48
 
 	Lopar					shift	23
 	atom					goto	20
+	Locbra					shift	24
 	Lnil					shift	21
 	Lnum					shift	26
 	funcall					goto	17
@@ -743,7 +744,6 @@ State 48
 	Lident					shift	25
 	Lbool					shift	28
 	operation					goto	19
-	Lobra					shift	24
 	Lstr					shift	27
 	sexpr					goto	71
 
@@ -777,7 +777,7 @@ State 49
 	Lmod					shift	44
 	Lsc					reduce	46
 	Land					reduce	46
-	Lcbra					reduce	46
+	Lccbra					reduce	46
 	Ladd					shift	40
 	Lcom					reduce	46
 	Lcpar					reduce	46
@@ -844,32 +844,32 @@ State 51
 	Llt					shift	36
 	Lgte					shift	39
 	Land					shift	45
-	Lcbra					reduce	55
+	Lsub					shift	41
+	Lccbra					reduce	55
 	Ladd					shift	40
 	Lmod					shift	44
-	Lsub					shift	41
 	Lcom					shift	73
 	Lgt					shift	37
 
 State 52
-	atom -> Lobra elem . Lcbra 
+	atom -> Locbra elem . Lccbra 
 
-	Lcbra					shift	74
+	Lccbra					shift	74
 
 State 53
 	funcall -> Lident Lopar . args Lcpar 
 
 	atom					goto	20
+	Lopar					shift	23
 	Lnum					shift	26
 	funcall					goto	17
 	Lident					shift	25
 	args					goto	75
 	sexpr					goto	76
-	Lopar					shift	23
+	Locbra					shift	24
 	Lnil					shift	21
 	Lnot					shift	22
 	operation					goto	19
-	Lobra					shift	24
 	Lstr					shift	27
 	Lbool					shift	28
 
@@ -938,7 +938,7 @@ State 58
 	Lmod					shift	44
 	Lsc					reduce	38
 	Land					reduce	38
-	Lcbra					reduce	38
+	Lccbra					reduce	38
 	Ladd					shift	40
 	Lcom					reduce	38
 	Lcpar					reduce	38
@@ -974,7 +974,7 @@ State 59
 	Lmod					shift	44
 	Lsc					reduce	39
 	Land					reduce	39
-	Lcbra					reduce	39
+	Lccbra					reduce	39
 	Ladd					shift	40
 	Lcom					reduce	39
 	Lcpar					reduce	39
@@ -1010,7 +1010,7 @@ State 60
 	Lmod					shift	44
 	Lsc					reduce	40
 	Land					reduce	40
-	Lcbra					reduce	40
+	Lccbra					reduce	40
 	Ladd					shift	40
 	Lcom					reduce	40
 	Lcpar					reduce	40
@@ -1046,7 +1046,7 @@ State 61
 	Lmod					shift	44
 	Lsc					reduce	41
 	Land					reduce	41
-	Lcbra					reduce	41
+	Lccbra					reduce	41
 	Ladd					shift	40
 	Lcom					reduce	41
 	Lcpar					reduce	41
@@ -1082,7 +1082,7 @@ State 62
 	Lmod					shift	44
 	Lsc					reduce	42
 	Land					reduce	42
-	Lcbra					reduce	42
+	Lccbra					reduce	42
 	Ladd					shift	40
 	Lcom					reduce	42
 	Lcpar					reduce	42
@@ -1118,7 +1118,7 @@ State 63
 	Lmod					shift	44
 	Lsc					reduce	43
 	Land					reduce	43
-	Lcbra					reduce	43
+	Lccbra					reduce	43
 	Ladd					shift	40
 	Lcom					reduce	43
 	Lcpar					reduce	43
@@ -1154,7 +1154,7 @@ State 64
 	Lmod					reduce	33
 	Lsc					reduce	33
 	Land					reduce	33
-	Lcbra					reduce	33
+	Lccbra					reduce	33
 	Ladd					reduce	33
 	Lcom					reduce	33
 	Lcpar					reduce	33
@@ -1190,7 +1190,7 @@ State 65
 	Lmod					reduce	34
 	Lsc					reduce	34
 	Land					reduce	34
-	Lcbra					reduce	34
+	Lccbra					reduce	34
 	Ladd					reduce	34
 	Lcom					reduce	34
 	Lcpar					reduce	34
@@ -1226,7 +1226,7 @@ State 66
 	Lmod					reduce	35
 	Lsc					reduce	35
 	Land					reduce	35
-	Lcbra					reduce	35
+	Lccbra					reduce	35
 	Ladd					reduce	35
 	Lcom					reduce	35
 	Lcpar					reduce	35
@@ -1262,7 +1262,7 @@ State 67
 	Lmod					reduce	36
 	Lsc					reduce	36
 	Land					reduce	36
-	Lcbra					reduce	36
+	Lccbra					reduce	36
 	Ladd					reduce	36
 	Lcom					reduce	36
 	Lcpar					reduce	36
@@ -1298,7 +1298,7 @@ State 68
 	Lmod					reduce	37
 	Lsc					reduce	37
 	Land					reduce	37
-	Lcbra					reduce	37
+	Lccbra					reduce	37
 	Ladd					shift	40
 	Lcom					reduce	37
 	Lcpar					reduce	37
@@ -1334,7 +1334,7 @@ State 69
 	Lmod					shift	44
 	Lsc					reduce	44
 	Land					reduce	44
-	Lcbra					reduce	44
+	Lccbra					reduce	44
 	Ladd					shift	40
 	Lcom					reduce	44
 	Lcpar					reduce	44
@@ -1370,7 +1370,7 @@ State 70
 	Lmod					shift	44
 	Lsc					reduce	45
 	Land					shift	45
-	Lcbra					reduce	45
+	Lccbra					reduce	45
 	Ladd					shift	40
 	Lcom					reduce	45
 	Lcpar					reduce	45
@@ -1406,7 +1406,7 @@ State 71
 	Lmod					shift	44
 	Lsc					reduce	47
 	Land					shift	45
-	Lcbra					reduce	47
+	Lccbra					reduce	47
 	Ladd					shift	40
 	Lcom					reduce	47
 	Lcpar					reduce	47
@@ -1428,7 +1428,7 @@ State 72
 	Lmod					reduce	32
 	Lsc					reduce	32
 	Land					reduce	32
-	Lcbra					reduce	32
+	Lccbra					reduce	32
 	Ladd					reduce	32
 	Lcom					reduce	32
 	Lcpar					reduce	32
@@ -1441,19 +1441,19 @@ State 73
 	Lnum					shift	26
 	funcall					goto	17
 	Lident					shift	25
+	Lstr					shift	27
 	sexpr					goto	51
-	Lopar					shift	23
-	Lcbra					reduce	56
+	Locbra					shift	24
 	Lnil					shift	21
+	Lccbra					reduce	56
 	Lnot					shift	22
 	elem					goto	81
 	operation					goto	19
-	Lobra					shift	24
-	Lstr					shift	27
+	Lopar					shift	23
 	Lbool					shift	28
 
 State 74
-	atom -> Lobra elem Lcbra . 
+	atom -> Locbra elem Lccbra . 
 
 	Llte					reduce	53
 	Lmul					reduce	53
@@ -1468,7 +1468,7 @@ State 74
 	Lmod					reduce	53
 	Lsc					reduce	53
 	Land					reduce	53
-	Lcbra					reduce	53
+	Lccbra					reduce	53
 	Ladd					reduce	53
 	Lcom					reduce	53
 	Lcpar					reduce	53
@@ -1543,7 +1543,7 @@ State 80
 State 81
 	elem -> sexpr Lcom elem . 
 
-	Lcbra					reduce	54
+	Lccbra					reduce	54
 
 State 82
 	funcall -> Lident Lopar args Lcpar . 
@@ -1561,7 +1561,7 @@ State 82
 	Lmod					reduce	26
 	Lsc					reduce	26
 	Land					reduce	26
-	Lcbra					reduce	26
+	Lccbra					reduce	26
 	Ladd					reduce	26
 	Lcom					reduce	26
 	Lcpar					reduce	26
@@ -1571,16 +1571,16 @@ State 83
 	args -> sexpr Lcom . args 
 
 	atom					goto	20
+	Lopar					shift	23
 	Lnum					shift	26
 	funcall					goto	17
 	Lident					shift	25
 	args					goto	87
 	sexpr					goto	76
-	Lopar					shift	23
+	Locbra					shift	24
 	Lnil					shift	21
 	Lnot					shift	22
 	operation					goto	19
-	Lobra					shift	24
 	Lstr					shift	27
 	Lbool					shift	28
 
@@ -1807,6 +1807,7 @@ State 105
 
 	Lopar					shift	23
 	atom					goto	20
+	Locbra					shift	24
 	Lnil					shift	21
 	Lnum					shift	26
 	funcall					goto	17
@@ -1814,7 +1815,6 @@ State 105
 	Lident					shift	25
 	Lbool					shift	28
 	operation					goto	19
-	Lobra					shift	24
 	Lstr					shift	27
 	sexpr					goto	111
 
@@ -1838,6 +1838,7 @@ State 107
 
 	Lopar					shift	23
 	atom					goto	20
+	Locbra					shift	24
 	Lnil					shift	21
 	Lnum					shift	26
 	funcall					goto	17
@@ -1845,7 +1846,6 @@ State 107
 	Lident					shift	25
 	Lbool					shift	28
 	operation					goto	19
-	Lobra					shift	24
 	Lstr					shift	27
 	sexpr					goto	112
 
@@ -1854,6 +1854,7 @@ State 108
 
 	Lopar					shift	23
 	atom					goto	20
+	Locbra					shift	24
 	Lnil					shift	21
 	Lnum					shift	26
 	funcall					goto	17
@@ -1861,7 +1862,6 @@ State 108
 	Lident					shift	25
 	Lbool					shift	28
 	operation					goto	19
-	Lobra					shift	24
 	Lstr					shift	27
 	sexpr					goto	113
 

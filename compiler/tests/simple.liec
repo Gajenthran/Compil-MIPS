@@ -1,5 +1,0 @@
-int main(argc, argv : int, str list) {
-  str a = "toto";
-  print_num(43);
-  return 0;
-}

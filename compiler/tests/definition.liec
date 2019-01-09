@@ -2,8 +2,8 @@
  * Définitions de variable de différents types.
  * Je vais essayer de faire référence à ses variables.
  */ 
-int main(argc, argv : int, str list) {
-  str a = "toto";   // Censé mettre "toto" dans .data puis charger l'adresse avec La
+int main(int, str list : argc, argv) {
+  // str a = "toto";   // Censé mettre "toto" dans .data puis charger l'adresse avec La
   int b = 10;       // v0 = 10
   bool is = true;   // v0 = 1
   return 0;
